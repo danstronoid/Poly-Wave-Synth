@@ -60,6 +60,7 @@ void WaveSynthEngine::setOscType(WaveType type)
 {
 	if (type != m_waveType)
 	{
+		m_waveType = type;
 		allNotesOff(0, false);
 
 		clearVoices();

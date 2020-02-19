@@ -16,11 +16,11 @@ PolyWaveSynthAudioProcessor::PolyWaveSynthAudioProcessor() :
 	parameters(*this, nullptr, "PolyWaveSynth",
 		{
 			std::make_unique<AudioParameterFloat>("gain", "Gain", 0.0f, 1.0f, 0.6f),
-			std::make_unique<AudioParameterFloat>("attack", "Attack", 0.001f, 2.0f, 0.01f),
-			std::make_unique<AudioParameterFloat>("decay", "Decay", 0.001f, 2.0f, 0.01f),
-			std::make_unique<AudioParameterFloat>("sustain", "Sustain", 0.0f, 1.0f, 1.0f),
-			std::make_unique<AudioParameterFloat>("release", "Release", 0.01f, 2.0f, 0.05f),
-			std::make_unique<AudioParameterFloat>("oscType", "OscType", 0.0f, 3.0f, 0.0f),
+			std::make_unique<AudioParameterFloat>("amp_attack", "Attack", 0.001f, 2.0f, 0.01f),
+			std::make_unique<AudioParameterFloat>("amp_decay", "Decay", 0.001f, 2.0f, 0.01f),
+			std::make_unique<AudioParameterFloat>("amp_sustain", "Sustain", 0.0f, 1.0f, 1.0f),
+			std::make_unique<AudioParameterFloat>("amp_release", "Release", 0.01f, 2.0f, 0.05f),
+			std::make_unique<AudioParameterInt>("oscType", "OscType", 0, 3, 0),
             std::make_unique<AudioParameterFloat>("cutoff", "Cufoff", 40.0f, 10000.0f, 4000.0f),
             std::make_unique<AudioParameterFloat>("q", "Q", 0.01f, 5.0f, 1.0f)
 		}),
@@ -36,10 +36,10 @@ PolyWaveSynthAudioProcessor::PolyWaveSynthAudioProcessor() :
 #endif
 {
 	parameters.addParameterListener("gain", this);
-	parameters.addParameterListener("attack", this);
-	parameters.addParameterListener("decay", this);
-	parameters.addParameterListener("sustain", this);
-	parameters.addParameterListener("release", this);
+	parameters.addParameterListener("amp_attack", this);
+	parameters.addParameterListener("amp_decay", this);
+	parameters.addParameterListener("amp_sustain", this);
+	parameters.addParameterListener("amp_release", this);
 	parameters.addParameterListener("oscType", this);
     parameters.addParameterListener("cutoff", this);
     parameters.addParameterListener("q", this);
@@ -114,27 +114,25 @@ void PolyWaveSynthAudioProcessor::changeProgramName (int index, const String& ne
 //==============================================================================
 void PolyWaveSynthAudioProcessor::parameterChanged(const String& parameterID, float newValue)
 {
-	if (parameterID == "attack")
+	if (parameterID == "amp_attack")
 		synthEngine.setAttack(newValue);
-	else if (parameterID == "decay")
+	else if (parameterID == "amp_decay")
 		synthEngine.setDecay(newValue);
-	else if (parameterID == "sustain")
+	else if (parameterID == "amp_sustain")
 		synthEngine.setSustain(newValue);
-	else if (parameterID == "release")
+	else if (parameterID == "amp_release")
 		synthEngine.setRelease(newValue);
 	else if (parameterID == "gain")
 		currentGain = newValue;
 	else if (parameterID == "oscType")
 	{
-		//dynamic_cast<AudioParameterChoice*>(parameters.getParameter("oscType"))->getIndex();
-		int index = roundToInt(newValue);
-		WaveType newWaveType{ static_cast<WaveType>(index) };
-		synthEngine.setOscType(newWaveType);
+        int index = newValue;
+		synthEngine.setOscType(static_cast<WaveType>(index));
 
-		auto* attack = parameters.getRawParameterValue("attack");
-		auto* decay = parameters.getRawParameterValue("decay");
-		auto* sustain = parameters.getRawParameterValue("sustain");
-		auto* release = parameters.getRawParameterValue("release");
+		auto* attack = parameters.getRawParameterValue("amp_attack");
+		auto* decay = parameters.getRawParameterValue("amp_decay");
+		auto* sustain = parameters.getRawParameterValue("amp_sustain");
+		auto* release = parameters.getRawParameterValue("amp_release");
 		synthEngine.setAttack(*attack);
 		synthEngine.setDecay(*decay);
 		synthEngine.setSustain(*sustain);
@@ -163,7 +161,7 @@ void PolyWaveSynthAudioProcessor::prepareToPlay (double sampleRate, int samplesP
     for (int channel = 0; channel < getTotalNumOutputChannels(); ++channel)
     {
         svf[channel].setSampleRate(sampleRate);
-        svf[channel].setParameters(State::Low_Pass, 200, 1);
+        svf[channel].setParameters(State::Low_Pass, 4000, 1);
     }
 }
 
@@ -232,8 +230,8 @@ bool PolyWaveSynthAudioProcessor::hasEditor() const
 
 AudioProcessorEditor* PolyWaveSynthAudioProcessor::createEditor()
 {
-    //return new PolyWaveSynthAudioProcessorEditor (*this);
-	return new GenericAudioProcessorEditor(*this);
+    return new PolyWaveSynthAudioProcessorEditor (*this, parameters);
+	//return new GenericAudioProcessorEditor(*this);
 }
 
 //==============================================================================

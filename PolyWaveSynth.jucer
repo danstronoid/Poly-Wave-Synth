@@ -5,8 +5,28 @@
               pluginManufacturer="Dingus Audio">
   <MAINGROUP id="wq10Q0" name="PolyWaveSynth">
     <GROUP id="{A410D81D-2AA3-5DA7-F626-6F259D649C9A}" name="Source">
-      <FILE id="v2nlME" name="Filter.h" compile="0" resource="0" file="Source/Filter.h"/>
-      <FILE id="LMkRRg" name="Envelope.h" compile="0" resource="0" file="Source/Envelope.h"/>
+      <GROUP id="{C2DF9C4A-BFED-A1E9-F3AB-6ED9A705830B}" name="GUI">
+        <FILE id="jj4X0Y" name="FilterGUI.h" compile="0" resource="0" file="Source/FilterGUI.h"/>
+        <FILE id="fgRAE5" name="AmpEnvGUI.h" compile="0" resource="0" file="Source/AmpEnvGUI.h"/>
+        <FILE id="Fm6Aln" name="OscGUI.h" compile="0" resource="0" file="Source/OscGUI.h"/>
+        <FILE id="oA50Mj" name="FilterEnvGUI.h" compile="0" resource="0" file="Source/FilterEnvGUI.h"/>
+      </GROUP>
+      <GROUP id="{5D13ABFA-8F51-338E-BD3D-AC8C56BFA2B6}" name="DSP">
+        <FILE id="YjUTZT" name="WaveSynth.cpp" compile="1" resource="0" file="Source/WaveSynth.cpp"/>
+        <FILE id="EgXRrJ" name="WaveSynth.h" compile="0" resource="0" file="Source/WaveSynth.h"/>
+        <FILE id="gkDGik" name="WaveTableGenerator.cpp" compile="1" resource="0"
+              file="Source/WaveTableGenerator.cpp"/>
+        <FILE id="ToYDnp" name="WaveTableGenerator.h" compile="0" resource="0"
+              file="Source/WaveTableGenerator.h"/>
+        <FILE id="FejxzU" name="WaveTableVoice.cpp" compile="1" resource="0"
+              file="Source/WaveTableVoice.cpp"/>
+        <FILE id="wwRrHA" name="WaveTableVoice.h" compile="0" resource="0"
+              file="Source/WaveTableVoice.h"/>
+        <FILE id="Sqeidb" name="Filter.cpp" compile="1" resource="0" file="Source/Filter.cpp"/>
+        <FILE id="v2nlME" name="Filter.h" compile="0" resource="0" file="Source/Filter.h"/>
+        <FILE id="f7t9x1" name="Envelope.cpp" compile="1" resource="0" file="Source/Envelope.cpp"/>
+        <FILE id="LMkRRg" name="Envelope.h" compile="0" resource="0" file="Source/Envelope.h"/>
+      </GROUP>
       <FILE id="kgSWy1" name="PluginEditor.cpp" compile="1" resource="0"
             file="Source/PluginEditor.cpp"/>
       <FILE id="I60AC7" name="PluginEditor.h" compile="0" resource="0" file="Source/PluginEditor.h"/>
@@ -14,16 +34,6 @@
             file="Source/PluginProcessor.cpp"/>
       <FILE id="AVEuPn" name="PluginProcessor.h" compile="0" resource="0"
             file="Source/PluginProcessor.h"/>
-      <FILE id="YjUTZT" name="WaveSynth.cpp" compile="1" resource="0" file="Source/WaveSynth.cpp"/>
-      <FILE id="EgXRrJ" name="WaveSynth.h" compile="0" resource="0" file="Source/WaveSynth.h"/>
-      <FILE id="FejxzU" name="WaveTableVoice.cpp" compile="1" resource="0"
-            file="Source/WaveTableVoice.cpp"/>
-      <FILE id="wwRrHA" name="WaveTableVoice.h" compile="0" resource="0"
-            file="Source/WaveTableVoice.h"/>
-      <FILE id="gkDGik" name="WaveTableGenerator.cpp" compile="1" resource="0"
-            file="Source/WaveTableGenerator.cpp"/>
-      <FILE id="ToYDnp" name="WaveTableGenerator.h" compile="0" resource="0"
-            file="Source/WaveTableGenerator.h"/>
     </GROUP>
   </MAINGROUP>
   <EXPORTFORMATS>

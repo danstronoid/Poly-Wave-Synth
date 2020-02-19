@@ -12,6 +12,12 @@
 
 #include "../JuceLibraryCode/JuceHeader.h"
 #include "PluginProcessor.h"
+#include "AmpEnvGUI.h"
+#include "OscGUI.h"
+#include "FilterGUI.h"
+#include "FilterEnvGUI.h"
+
+typedef AudioProcessorValueTreeState::SliderAttachment SliderAttachment;
 
 //==============================================================================
 /**
@@ -19,7 +25,7 @@
 class PolyWaveSynthAudioProcessorEditor  : public AudioProcessorEditor
 {
 public:
-    PolyWaveSynthAudioProcessorEditor (PolyWaveSynthAudioProcessor&);
+    PolyWaveSynthAudioProcessorEditor (PolyWaveSynthAudioProcessor&, AudioProcessorValueTreeState&);
     ~PolyWaveSynthAudioProcessorEditor();
 
     //==============================================================================
@@ -30,6 +36,12 @@ private:
     // This reference is provided as a quick way for your editor to
     // access the processor object that created it.
     PolyWaveSynthAudioProcessor& processor;
+    AudioProcessorValueTreeState& parameters;
+
+    AmpEnvGUI ampEnvGUI;
+    OscGUI oscGUI;
+    FilterGUI filterGUI;
+    FilterEnvGUI filterEnvGUI;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (PolyWaveSynthAudioProcessorEditor)
 };
