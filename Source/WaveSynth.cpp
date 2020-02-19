@@ -12,7 +12,7 @@
 
 WaveSynthEngine::WaveSynthEngine()
 {
-	setNoteStealingEnabled(false);
+	setNoteStealingEnabled(true);
 
 	for (int i = 0; i < m_maxVoices; ++i)
 		addVoice(new WaveTableVoice(m_tableGenerator.getTables(m_waveType)));
@@ -20,39 +20,12 @@ WaveSynthEngine::WaveSynthEngine()
 	addSound(new WaveTableSound);
 }
 
-void WaveSynthEngine::setAttack(float attack)
+void WaveSynthEngine::setAmpADSR(float attack, float decay, float sustain, float release)
 {
 	for (int i = 0; i < getNumVoices(); ++i)
 	{
 		auto* voice = dynamic_cast<WaveTableVoice*>(getVoice(i));
-		voice->m_attackTime = attack;
-	}
-}
-
-void WaveSynthEngine::setDecay(float decay)
-{
-	for (int i = 0; i < getNumVoices(); ++i)
-	{
-		auto* voice = dynamic_cast<WaveTableVoice*>(getVoice(i));
-		voice->m_decayTime = decay;
-	}
-}
-
-void WaveSynthEngine::setSustain(float sustain)
-{
-	for (int i = 0; i < getNumVoices(); ++i)
-	{
-		auto* voice = dynamic_cast<WaveTableVoice*>(getVoice(i));
-		voice->m_sustainLevel = sustain;
-	}
-}
-
-void WaveSynthEngine::setRelease(float release)
-{
-	for (int i = 0; i < getNumVoices(); ++i)
-	{
-		auto* voice = dynamic_cast<WaveTableVoice*>(getVoice(i));
-		voice->m_releaseTime = release;
+		voice->m_ampADSR.setParameters(attack, decay, sustain, release);
 	}
 }
 
@@ -66,6 +39,24 @@ void WaveSynthEngine::setOscType(WaveType type)
 		clearVoices();
 		for (int i = 0; i < m_maxVoices; ++i)
 			addVoice(new WaveTableVoice(m_tableGenerator.getTables(type)));
+	}
+}
+
+void WaveSynthEngine::setFilterParameters(State state, double cutoff, double q)
+{
+	for (int i = 0; i < getNumVoices(); ++i)
+	{
+		auto* voice = dynamic_cast<WaveTableVoice*>(getVoice(i));
+		voice->m_svf.setParameters(state, cutoff, q);
+	}
+}
+
+void WaveSynthEngine::setFilterADSR(float attack, float decay, float sustain, float release)
+{
+	for (int i = 0; i < getNumVoices(); ++i)
+	{
+		auto* voice = dynamic_cast<WaveTableVoice*>(getVoice(i));
+		voice->m_filterADSR.setParameters(attack, decay, sustain, release);
 	}
 }
 

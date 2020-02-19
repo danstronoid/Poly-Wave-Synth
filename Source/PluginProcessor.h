@@ -12,7 +12,6 @@
 
 #include "../JuceLibraryCode/JuceHeader.h"
 #include "WaveSynth.h"
-#include "Filter.h"
 
 //==============================================================================
 /**
@@ -61,15 +60,15 @@ public:
     void getStateInformation (MemoryBlock& destData) override;
     void setStateInformation (const void* data, int sizeInBytes) override;
 
+    void initParameters();
+
 private:
 	AudioProcessorValueTreeState parameters;
 	WaveSynthEngine synthEngine;
-    std::vector<StateVariableFilter> svf{ 2 };
 
 	float currentGain{ 0.6f };
 	float previousGain{ 0.6f };
 
-	const StringArray oscTypes = { "Sine", "Square", "Saw", "Tri" };
     //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (PolyWaveSynthAudioProcessor)
 };

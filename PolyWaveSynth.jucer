@@ -12,6 +12,8 @@
         <FILE id="oA50Mj" name="FilterEnvGUI.h" compile="0" resource="0" file="Source/FilterEnvGUI.h"/>
       </GROUP>
       <GROUP id="{5D13ABFA-8F51-338E-BD3D-AC8C56BFA2B6}" name="DSP">
+        <FILE id="jLqd8a" name="StateVariableFilter.h" compile="0" resource="0"
+              file="Source/StateVariableFilter.h"/>
         <FILE id="YjUTZT" name="WaveSynth.cpp" compile="1" resource="0" file="Source/WaveSynth.cpp"/>
         <FILE id="EgXRrJ" name="WaveSynth.h" compile="0" resource="0" file="Source/WaveSynth.h"/>
         <FILE id="gkDGik" name="WaveTableGenerator.cpp" compile="1" resource="0"

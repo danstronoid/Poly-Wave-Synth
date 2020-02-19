@@ -19,15 +19,15 @@ class WaveSynthEngine : public Synthesiser {
 public:
 	WaveSynthEngine();
 
-	void setAttack(float attack);
-	void setDecay(float decay);
-	void setSustain(float sustain);
-	void setRelease(float release);
+	void setAmpADSR(float attack, float decay, float sustain, float release);
 	void setOscType(WaveType type);
+
+	void setFilterParameters(State state, double cutoff, double q);
+	void setFilterADSR(float attack, float decay, float sustain, float release);
 
 private:
 	WaveTableGenerator m_tableGenerator;
-	const int m_maxVoices{ 12 };
+	const int m_maxVoices{ 16 };
 	WaveType m_waveType{ SINE };
 };
 

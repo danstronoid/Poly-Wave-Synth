@@ -12,6 +12,7 @@
 
 #include "../JuceLibraryCode/JuceHeader.h"
 #include "Envelope.h"
+#include "StateVariableFilter.h"
 
 class WaveTableVoice : public SynthesiserVoice {
 public:
@@ -28,10 +29,10 @@ public:
 	void pitchWheelMoved(int /*newPitchWheelValue*/) override;
 	void controllerMoved(int /*controllerNumber*/, int /*newControllerValue*/) override;
 
-	float m_attackTime{ 0.05f };
-	float m_decayTime{ 0.01f };
-	float m_sustainLevel{ 1.0f };
-	float m_releaseTime{ 0.1f };
+	// these are public for ease of changing parameters
+	StateVariableFilter m_svf;
+	Envelope m_ampADSR;
+	Envelope m_filterADSR;
 
 private:
 	// maintain a reference to the tableGenerator owned by the WaveSynthEngine
@@ -45,8 +46,6 @@ private:
 	float m_tableDelta{ 0.0f };
 
 	float m_level{ 0.0f };
-
-	Envelope m_adsr;
 };
 
 //==============================================================================

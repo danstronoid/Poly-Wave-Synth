@@ -13,7 +13,11 @@
 WaveTableVoice::WaveTableVoice(const std::vector<AudioSampleBuffer>& tables) :
 	m_tables(tables)
 {
-	m_adsr.setSampleRate(getSampleRate());
+	m_svf.setSampleRate(getSampleRate());
+	m_svf.setParameters(State::Low_Pass, 400, 1);
+
+	m_ampADSR.setSampleRate(getSampleRate());
+	m_filterADSR.setSampleRate(getSampleRate());
 }
 
 bool WaveTableVoice::isVoiceActive() const
@@ -42,19 +46,21 @@ void WaveTableVoice::startNote(int midiNoteNumber, float velocity, SynthesiserSo
 	float sizeOverSR = (float)m_tableSize / getSampleRate();
 	m_tableDelta = frequency * sizeOverSR;
 
-	m_adsr.set(m_attackTime, m_decayTime, m_sustainLevel, m_releaseTime);
-	m_adsr.noteOn();
+	m_ampADSR.noteOn();
+	m_filterADSR.noteOn();
 }
 
 void WaveTableVoice::stopNote(float velocity, bool allowTailOff)
 {
 	if (allowTailOff)
 	{
-		m_adsr.noteOff();
+		m_ampADSR.noteOff();
+		m_filterADSR.noteOff();
 	}
 	else
 	{
-		m_adsr.reset();
+		m_ampADSR.reset();
+		m_filterADSR.reset();
 		clearCurrentNote();
 		m_tableDelta = 0;
 	}
@@ -67,11 +73,13 @@ void WaveTableVoice::renderNextBlock(AudioBuffer<float>& outputBuffer, int start
 
 		while (--numSamples >= 0)
 		{
-			float envValue = m_adsr.getNextSample();
+			float ampEnvValue = m_ampADSR.getNextSample();
+			float filterEnvValue = m_filterADSR.getNextSample();
 
-			if (!m_adsr.isActive())
+			if (!m_ampADSR.isActive())
 			{
-				m_adsr.reset();
+				m_ampADSR.reset();
+				m_filterADSR.reset();
 				clearCurrentNote();
 				m_tableDelta = 0;
 			}
@@ -87,8 +95,11 @@ void WaveTableVoice::renderNextBlock(AudioBuffer<float>& outputBuffer, int start
 
 			float currentSample = value0 + frac * (value1 - value0);
 
+			m_svf.update(filterEnvValue);
+			currentSample = m_svf.renderSample(currentSample);
+
 			for (auto channel = outputBuffer.getNumChannels(); --channel >= 0;)
-				outputBuffer.addSample(channel, startSample, currentSample * m_level * envValue);
+				outputBuffer.addSample(channel, startSample, currentSample * m_level * ampEnvValue);
 
 			if ((m_tablePos += m_tableDelta) > m_tableSize)
 				m_tablePos -= m_tableSize;
@@ -115,3 +126,4 @@ bool WaveTableSound::appliesToChannel(int /*midiChannel*/)
 {
 	return true;
 }
+

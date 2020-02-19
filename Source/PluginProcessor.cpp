@@ -15,14 +15,21 @@
 PolyWaveSynthAudioProcessor::PolyWaveSynthAudioProcessor() :
 	parameters(*this, nullptr, "PolyWaveSynth",
 		{
+            // osciallator parameters
+            std::make_unique<AudioParameterInt>("oscType", "OscType", 0, 3, 0),
 			std::make_unique<AudioParameterFloat>("gain", "Gain", 0.0f, 1.0f, 0.6f),
 			std::make_unique<AudioParameterFloat>("amp_attack", "Attack", 0.001f, 2.0f, 0.01f),
 			std::make_unique<AudioParameterFloat>("amp_decay", "Decay", 0.001f, 2.0f, 0.01f),
 			std::make_unique<AudioParameterFloat>("amp_sustain", "Sustain", 0.0f, 1.0f, 1.0f),
 			std::make_unique<AudioParameterFloat>("amp_release", "Release", 0.01f, 2.0f, 0.05f),
-			std::make_unique<AudioParameterInt>("oscType", "OscType", 0, 3, 0),
+
+            // filter parameters
             std::make_unique<AudioParameterFloat>("cutoff", "Cufoff", 40.0f, 10000.0f, 4000.0f),
-            std::make_unique<AudioParameterFloat>("q", "Q", 0.01f, 5.0f, 1.0f)
+            std::make_unique<AudioParameterFloat>("q", "Q", 0.01f, 5.0f, 1.0f),
+            std::make_unique<AudioParameterFloat>("filter_attack", "Attack", 0.001f, 2.0f, 0.01f),
+            std::make_unique<AudioParameterFloat>("filter_decay", "Decay", 0.001f, 2.0f, 0.01f),
+            std::make_unique<AudioParameterFloat>("filter_sustain", "Sustain", 0.0f, 1.0f, 1.0f),
+            std::make_unique<AudioParameterFloat>("filter_release", "Release", 0.01f, 2.0f, 0.05f)
 		}),
 #ifndef JucePlugin_PreferredChannelConfigurations
 	AudioProcessor(BusesProperties()
@@ -35,18 +42,45 @@ PolyWaveSynthAudioProcessor::PolyWaveSynthAudioProcessor() :
 	)
 #endif
 {
+    parameters.addParameterListener("oscType", this);
 	parameters.addParameterListener("gain", this);
 	parameters.addParameterListener("amp_attack", this);
 	parameters.addParameterListener("amp_decay", this);
 	parameters.addParameterListener("amp_sustain", this);
 	parameters.addParameterListener("amp_release", this);
-	parameters.addParameterListener("oscType", this);
+
     parameters.addParameterListener("cutoff", this);
     parameters.addParameterListener("q", this);
+    parameters.addParameterListener("filter_attack", this);
+    parameters.addParameterListener("filter_decay", this);
+    parameters.addParameterListener("filter_sustain", this);
+    parameters.addParameterListener("filter_release", this);
+
+    initParameters();
 }
 
 PolyWaveSynthAudioProcessor::~PolyWaveSynthAudioProcessor()
 {
+}
+
+void PolyWaveSynthAudioProcessor::initParameters()
+{
+    // this is a cheeky way of initializing values, probably a better way
+    auto* amp_attack = parameters.getRawParameterValue("amp_attack");
+    auto* amp_decay = parameters.getRawParameterValue("amp_decay");
+    auto* amp_sustain = parameters.getRawParameterValue("amp_sustain");
+    auto* amp_release = parameters.getRawParameterValue("amp_release");
+    synthEngine.setAmpADSR(*amp_attack, *amp_decay, *amp_sustain, *amp_release);
+
+    auto* cutoff = parameters.getRawParameterValue("cutoff");
+    auto* q = parameters.getRawParameterValue("q");
+    synthEngine.setFilterParameters(State::Low_Pass, *cutoff, *q);
+
+    auto* filter_attack = parameters.getRawParameterValue("filter_attack");
+    auto* filter_decay = parameters.getRawParameterValue("filter_decay");
+    auto* filter_sustain = parameters.getRawParameterValue("filter_sustain");
+    auto* filter_release = parameters.getRawParameterValue("filter_release");
+    synthEngine.setFilterADSR(*filter_attack, *filter_decay, *filter_sustain, *filter_release);
 }
 
 //==============================================================================
@@ -114,14 +148,15 @@ void PolyWaveSynthAudioProcessor::changeProgramName (int index, const String& ne
 //==============================================================================
 void PolyWaveSynthAudioProcessor::parameterChanged(const String& parameterID, float newValue)
 {
-	if (parameterID == "amp_attack")
-		synthEngine.setAttack(newValue);
-	else if (parameterID == "amp_decay")
-		synthEngine.setDecay(newValue);
-	else if (parameterID == "amp_sustain")
-		synthEngine.setSustain(newValue);
-	else if (parameterID == "amp_release")
-		synthEngine.setRelease(newValue);
+    if (parameterID == "amp_attack" || parameterID == "amp_decay"
+        || parameterID == "amp_sustain" || parameterID == "amp_release")
+    {
+        auto* amp_attack = parameters.getRawParameterValue("amp_attack");
+        auto* amp_decay = parameters.getRawParameterValue("amp_decay");
+        auto* amp_sustain = parameters.getRawParameterValue("amp_sustain");
+        auto* amp_release = parameters.getRawParameterValue("amp_release");
+        synthEngine.setAmpADSR(*amp_attack, *amp_decay, *amp_sustain, *amp_release);
+    }
 	else if (parameterID == "gain")
 		currentGain = newValue;
 	else if (parameterID == "oscType")
@@ -129,28 +164,22 @@ void PolyWaveSynthAudioProcessor::parameterChanged(const String& parameterID, fl
         int index = newValue;
 		synthEngine.setOscType(static_cast<WaveType>(index));
 
-		auto* attack = parameters.getRawParameterValue("amp_attack");
-		auto* decay = parameters.getRawParameterValue("amp_decay");
-		auto* sustain = parameters.getRawParameterValue("amp_sustain");
-		auto* release = parameters.getRawParameterValue("amp_release");
-		synthEngine.setAttack(*attack);
-		synthEngine.setDecay(*decay);
-		synthEngine.setSustain(*sustain);
-		synthEngine.setRelease(*release);
+        initParameters();
 	}
-    else if (parameterID == "cutoff")
-    {
-        auto* q = parameters.getRawParameterValue("q");
-
-        for (int channel = 0; channel < getTotalNumOutputChannels(); ++channel)
-            svf[channel].setParameters(State::Low_Pass, newValue, *q);
-    }
-    else if (parameterID == "q")
+    else if (parameterID == "cutoff" || parameterID == "q")
     {
         auto* cutoff = parameters.getRawParameterValue("cutoff");
-
-        for (int channel = 0; channel < getTotalNumOutputChannels(); ++channel)
-            svf[channel].setParameters(State::Low_Pass, *cutoff, newValue);
+        auto* q = parameters.getRawParameterValue("q");
+        synthEngine.setFilterParameters(State::Low_Pass, *cutoff, *q);
+    }
+    else if (parameterID == "filter_attack" || parameterID == "filter_decay"
+        || parameterID == "filter_sustain" || parameterID == "filter_release")
+    {
+        auto* filter_attack = parameters.getRawParameterValue("filter_attack");
+        auto* filter_decay = parameters.getRawParameterValue("filter_decay");
+        auto* filter_sustain = parameters.getRawParameterValue("filter_sustain");
+        auto* filter_release = parameters.getRawParameterValue("filter_release");
+        synthEngine.setFilterADSR(*filter_attack, *filter_decay, *filter_sustain, *filter_release);
     }
 }
 
@@ -158,11 +187,6 @@ void PolyWaveSynthAudioProcessor::prepareToPlay (double sampleRate, int samplesP
 {
 	synthEngine.setCurrentPlaybackSampleRate(sampleRate);
     
-    for (int channel = 0; channel < getTotalNumOutputChannels(); ++channel)
-    {
-        svf[channel].setSampleRate(sampleRate);
-        svf[channel].setParameters(State::Low_Pass, 4000, 1);
-    }
 }
 
 void PolyWaveSynthAudioProcessor::releaseResources()
@@ -206,12 +230,6 @@ void PolyWaveSynthAudioProcessor::processBlock (AudioBuffer<float>& buffer, Midi
 
 	synthEngine.renderNextBlock(buffer, midiMessages, 0, buffer.getNumSamples());
 
-    for (int channel = 0; channel < getTotalNumOutputChannels(); ++channel)
-    {
-        auto* samples = buffer.getWritePointer(channel);
-        svf[channel].renderBlock(samples, buffer.getNumSamples());
-    }
-
 	if (previousGain == currentGain)
 		buffer.applyGain(currentGain);
 	else
@@ -237,15 +255,18 @@ AudioProcessorEditor* PolyWaveSynthAudioProcessor::createEditor()
 //==============================================================================
 void PolyWaveSynthAudioProcessor::getStateInformation (MemoryBlock& destData)
 {
-    // You should use this method to store your parameters in the memory block.
-    // You could do that either as raw data, or use the XML or ValueTree classes
-    // as intermediaries to make it easy to save and load complex data.
+    auto state = parameters.copyState();
+    std::unique_ptr<XmlElement> xml(state.createXml());
+    copyXmlToBinary(*xml, destData);
 }
 
 void PolyWaveSynthAudioProcessor::setStateInformation (const void* data, int sizeInBytes)
 {
-    // You should use this method to restore your parameters from this memory block,
-    // whose contents will have been created by the getStateInformation() call.
+    std::unique_ptr<XmlElement> xmlState(getXmlFromBinary(data, sizeInBytes));
+
+    if (xmlState.get() != nullptr)
+        if (xmlState->hasTagName(parameters.state.getType()))
+            parameters.replaceState(ValueTree::fromXml(*xmlState));
 }
 
 //==============================================================================

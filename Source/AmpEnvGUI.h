@@ -111,6 +111,5 @@ private:
     std::unique_ptr<SliderAttachment> sustainAttach;
     std::unique_ptr<SliderAttachment> releaseAttach;
 
-
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (AmpEnvGUI)
 };
