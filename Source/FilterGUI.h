@@ -25,45 +25,52 @@ public:
     {
         setSize(200, 200);
 
+        // Sliders
         cutoffSlider.setSliderStyle(Slider::RotaryHorizontalVerticalDrag);
         cutoffSlider.setTextBoxStyle(Slider::NoTextBox, true, 0, 0);
         cutoffSlider.setPopupDisplayEnabled(true, false, this);
         addAndMakeVisible(&cutoffSlider);
         cutoffAttach.reset(new SliderAttachment(parameters, "cutoff", cutoffSlider));
-        cutoffLabel.setText("Cutoff", dontSendNotification);
-        cutoffLabel.setJustificationType(Justification::centred);
-        addAndMakeVisible(&cutoffLabel);
-        cutoffLabel.attachToComponent(&cutoffSlider, false);
 
         qSlider.setSliderStyle(Slider::RotaryHorizontalVerticalDrag);
         qSlider.setTextBoxStyle(Slider::NoTextBox, true, 0, 0); 
         qSlider.setPopupDisplayEnabled(true, false, this);
         addAndMakeVisible(&qSlider);
         qAttach.reset(new SliderAttachment(parameters, "q", qSlider));
-        qLabel.setText("Q", dontSendNotification);
-        qLabel.setJustificationType(Justification::centred);
-        addAndMakeVisible(&qLabel);
-        qLabel.attachToComponent(&qSlider, false);
 
         envAmtSlider.setSliderStyle(Slider::RotaryHorizontalVerticalDrag);
         envAmtSlider.setTextBoxStyle(Slider::NoTextBox, true, 0, 0);
         envAmtSlider.setPopupDisplayEnabled(true, false, this);
         addAndMakeVisible(&envAmtSlider);
         envAmtAttach.reset(new SliderAttachment(parameters, "envAmt", envAmtSlider));
+
+        filterType.addItem("LP", 1); 
+        filterType.addItem("HP", 2);
+        filterType.addItem("BP", 3);
+        filterType.setJustificationType(Justification::centred);
+        addAndMakeVisible(&filterType);
+        filterTypeAttach.reset(new ComboBoxAttachment(parameters, "filterType", filterType));
+
+        // Labels
+        cutoffLabel.setText("Cutoff", dontSendNotification);
+        cutoffLabel.setJustificationType(Justification::centred);
+        addAndMakeVisible(&cutoffLabel);
+        cutoffLabel.attachToComponent(&cutoffSlider, false);
+
+        qLabel.setText("Q", dontSendNotification);
+        qLabel.setJustificationType(Justification::centred);
+        addAndMakeVisible(&qLabel);
+        qLabel.attachToComponent(&qSlider, false);
+
         envAmtLabel.setText("Env", dontSendNotification);
         envAmtLabel.setJustificationType(Justification::centred);
         addAndMakeVisible(&qLabel);
         envAmtLabel.attachToComponent(&envAmtSlider, false);
 
-        filterType.addItem("Low Pass", 1); 
-        filterType.addItem("High Pass", 2);
-        filterType.addItem("Band Pass", 3);
-        addAndMakeVisible(&filterType);
-        filterTypeAttach.reset(new ComboBoxAttachment(parameters, "filterType", filterType));
-        filterTypeLabel.setText("Filter Type", dontSendNotification);
-        filterTypeLabel.setJustificationType(Justification::centred);
-        addAndMakeVisible(&filterTypeLabel);
-        filterTypeLabel.attachToComponent(&filterType, false);
+        filterLabel.setText("Filter", dontSendNotification);
+        filterLabel.setFont(Font(20.0f, Font::bold));
+        filterLabel.setJustificationType(Justification::centred);
+        addAndMakeVisible(&filterLabel);
     }
 
     ~FilterGUI()
@@ -72,32 +79,40 @@ public:
 
     void paint (Graphics& g) override
     {
-        g.fillAll (getLookAndFeel().findColour (ResizableWindow::backgroundColourId));   // clear the background
-
-        g.setColour (Colours::white);
-        g.drawRect (getLocalBounds(), 1);   // draw an outline around the component
+        //g.fillAll (getLookAndFeel().findColour (ResizableWindow::backgroundColourId));   // clear the background
 
         //g.setColour (Colours::white);
-        //g.setFont (14.0f);
-        //g.drawText ("FilterGUI", getLocalBounds(), Justification::centred, true);   // draw some placeholder text
+        //g.drawRect (getLocalBounds(), 1);   // draw an outline around the component
+
+        //Rectangle<int> area = getLocalBounds().reduced(padding);
+        //g.setColour (Colours::white);
+        //g.setFont (Font(Font::getDefaultSansSerifFontName(), 42.0f, Font::bold));
+        //g.drawText ("Filter", area.removeFromTop(getHeight() / 3), Justification::left, true);
     }
 
     void resized() override
     {
         const int padding = 10;
         Rectangle<int> area = getLocalBounds().reduced(padding);
-        int sliderWidth = area.getWidth() / 3;
-        int sliderHeight = area.getHeight() / 3;
-        //remove space for the label
-        area.removeFromTop(padding * 2);
+        int rotaryWidth = area.getWidth() / 3;
+        int rotaryHeight = area.getHeight() / 3;
+        int boxWidth = area.getWidth() / 3;
+        int boxHeight = padding * 2;
 
-        cutoffSlider.setBounds(area.removeFromLeft(sliderWidth).removeFromTop(sliderHeight));
-        qSlider.setBounds(area.removeFromLeft(sliderWidth).removeFromTop(sliderHeight));
-        envAmtSlider.setBounds(area.removeFromLeft(sliderWidth).removeFromTop(sliderHeight));
+        // top half
+        area.removeFromTop(padding);
+        filterLabel.setBounds(area.removeFromLeft(boxWidth).removeFromTop(rotaryHeight));
+        Rectangle<int> boxArea = area.removeFromRight(boxWidth).removeFromTop(rotaryHeight);
+        filterType.setBounds(boxArea.getX(), boxArea.getY() + boxArea.getHeight() / 2 - boxHeight / 2,
+            boxArea.getWidth(), boxHeight);
 
+        // bottom half
         area = getLocalBounds().reduced(padding);
-        area.removeFromTop(sliderHeight + padding * 4);
-        filterType.setBounds(area.removeFromLeft(sliderWidth * 2).removeFromTop(padding * 2));
+        area.removeFromBottom(padding);
+        cutoffSlider.setBounds(area.removeFromLeft(rotaryWidth).removeFromBottom(rotaryHeight));
+        qSlider.setBounds(area.removeFromLeft(rotaryWidth).removeFromBottom(rotaryHeight));
+        envAmtSlider.setBounds(area.removeFromBottom(rotaryHeight));
+
         
     }
 
@@ -112,7 +127,7 @@ private:
     Label cutoffLabel;
     Label qLabel;
     Label envAmtLabel;
-    Label filterTypeLabel;
+    Label filterLabel;
 
     std::unique_ptr<SliderAttachment> cutoffAttach;
     std::unique_ptr<SliderAttachment> qAttach;

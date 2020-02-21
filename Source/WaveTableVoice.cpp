@@ -95,11 +95,13 @@ void WaveTableVoice::renderNextBlock(AudioBuffer<float>& outputBuffer, int start
 
 			float currentSample = value0 + frac * (value1 - value0);
 
+			float noise = random.nextFloat() * m_noise - (m_noise / 2);
+
 			m_svf.update(filterEnvValue);
-			currentSample = m_svf.renderSample(currentSample);
+			currentSample = m_svf.renderSample(currentSample * m_level + noise);
 
 			for (auto channel = outputBuffer.getNumChannels(); --channel >= 0;)
-				outputBuffer.addSample(channel, startSample, currentSample * m_level * ampEnvValue);
+				outputBuffer.addSample(channel, startSample, currentSample * ampEnvValue);
 
 			if ((m_tablePos += m_tableDelta) > m_tableSize)
 				m_tablePos -= m_tableSize;

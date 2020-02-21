@@ -34,6 +34,8 @@ public:
 	Envelope m_ampADSR;
 	Envelope m_filterADSR;
 	float m_envAmt{ 0.0f };
+	float m_level{ 0.0f };
+	float m_noise{ 0.0f };
 
 private:
 	// maintain a reference to the tableGenerator owned by the WaveSynthEngine
@@ -46,7 +48,7 @@ private:
 	float m_tablePos{ 0.0f };
 	float m_tableDelta{ 0.0f };
 
-	float m_level{ 0.0f };
+	Random random;
 };
 
 //==============================================================================

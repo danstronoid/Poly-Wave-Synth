@@ -20,15 +20,6 @@ WaveSynthEngine::WaveSynthEngine()
 	addSound(new WaveTableSound);
 }
 
-void WaveSynthEngine::setAmpADSR(float attack, float decay, float sustain, float release)
-{
-	for (int i = 0; i < getNumVoices(); ++i)
-	{
-		auto* voice = dynamic_cast<WaveTableVoice*>(getVoice(i));
-		voice->m_ampADSR.setParameters(attack, decay, sustain, release);
-	}
-}
-
 void WaveSynthEngine::setOscType(WaveType type)
 {
 	if (type != m_waveType)
@@ -39,6 +30,24 @@ void WaveSynthEngine::setOscType(WaveType type)
 		clearVoices();
 		for (int i = 0; i < m_maxVoices; ++i)
 			addVoice(new WaveTableVoice(m_tableGenerator.getTables(type)));
+	}
+}
+
+void WaveSynthEngine::setOscParameters(float noise)
+{
+	for (int i = 0; i < getNumVoices(); ++i)
+	{
+		auto* voice = dynamic_cast<WaveTableVoice*>(getVoice(i));
+		voice->m_noise = noise;
+	}
+}
+
+void WaveSynthEngine::setAmpADSR(float attack, float decay, float sustain, float release)
+{
+	for (int i = 0; i < getNumVoices(); ++i)
+	{
+		auto* voice = dynamic_cast<WaveTableVoice*>(getVoice(i));
+		voice->m_ampADSR.setParameters(attack, decay, sustain, release);
 	}
 }
 

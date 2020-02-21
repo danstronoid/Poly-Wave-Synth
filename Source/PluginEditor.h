@@ -43,5 +43,8 @@ private:
     FilterGUI filterGUI;
     FilterEnvGUI filterEnvGUI;
 
+    const int componentWidth = 200;
+    const int componentHeight = 200;
+
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (PolyWaveSynthAudioProcessorEditor)
 };

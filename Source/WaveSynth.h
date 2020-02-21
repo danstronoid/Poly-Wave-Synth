@@ -19,8 +19,10 @@ class WaveSynthEngine : public Synthesiser {
 public:
 	WaveSynthEngine();
 
-	void setAmpADSR(float attack, float decay, float sustain, float release);
 	void setOscType(WaveType type);
+	void setOscParameters(float noise);
+	void setAmpADSR(float attack, float decay, float sustain, float release);
+	
 
 	void setFilterParameters(State state, double cutoff, double q, float envAmt);
 	void setFilterADSR(float attack, float decay, float sustain, float release);

@@ -23,6 +23,7 @@ PolyWaveSynthAudioProcessor::PolyWaveSynthAudioProcessor() :
             // osciallator parameters
             std::make_unique<AudioParameterInt>("oscType", "OscType", 0, 3, 0),
             std::make_unique<AudioParameterFloat>("gain", "Gain", 0.0f, 1.0f, 0.6f),
+            std::make_unique<AudioParameterFloat>("noise", "Noise", 0.0f, 0.3f, 0.0f),
             std::make_unique<AudioParameterFloat>("amp_attack", "Attack", 0.001f, 2.0f, 0.01f),
             std::make_unique<AudioParameterFloat>("amp_decay", "Decay", 0.001f, 2.0f, 0.01f),
             std::make_unique<AudioParameterFloat>("amp_sustain", "Sustain", 0.0f, 1.0f, 1.0f),
@@ -51,6 +52,7 @@ PolyWaveSynthAudioProcessor::PolyWaveSynthAudioProcessor() :
 {
     parameters.addParameterListener("oscType", this);
 	parameters.addParameterListener("gain", this);
+    parameters.addParameterListener("noise", this);
 	parameters.addParameterListener("amp_attack", this);
 	parameters.addParameterListener("amp_decay", this);
 	parameters.addParameterListener("amp_sustain", this);
@@ -75,6 +77,9 @@ PolyWaveSynthAudioProcessor::~PolyWaveSynthAudioProcessor()
 void PolyWaveSynthAudioProcessor::initParameters()
 {
     // this is a cheeky way of initializing values, probably a better way
+    auto* noise = parameters.getRawParameterValue("noise");
+    synthEngine.setOscParameters(*noise);
+
     auto* amp_attack = parameters.getRawParameterValue("amp_attack");
     auto* amp_decay = parameters.getRawParameterValue("amp_decay");
     auto* amp_sustain = parameters.getRawParameterValue("amp_sustain");
@@ -170,6 +175,11 @@ void PolyWaveSynthAudioProcessor::parameterChanged(const String& parameterID, fl
     }
 	else if (parameterID == "gain")
 		currentGain = newValue;
+    else if (parameterID == "noise")
+    {
+        auto* noise = parameters.getRawParameterValue("noise");
+        synthEngine.setOscParameters(*noise);
+    }
 	else if (parameterID == "oscType")
 	{
         int index = newValue;
