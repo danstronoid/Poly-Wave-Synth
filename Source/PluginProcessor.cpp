@@ -11,21 +11,28 @@
 #include "PluginProcessor.h"
 #include "PluginEditor.h"
 
+NormalisableRange<float> frequencyRange(float min, float max, float interval)
+{
+    return { min, max, interval, 1.0f / std::log2(1.0f + std::sqrt(max / min)) };
+}
+
 //==============================================================================
 PolyWaveSynthAudioProcessor::PolyWaveSynthAudioProcessor() :
-	parameters(*this, nullptr, "PolyWaveSynth",
-		{
+    parameters(*this, nullptr, "PolyWaveSynth",
+        {
             // osciallator parameters
             std::make_unique<AudioParameterInt>("oscType", "OscType", 0, 3, 0),
-			std::make_unique<AudioParameterFloat>("gain", "Gain", 0.0f, 1.0f, 0.6f),
-			std::make_unique<AudioParameterFloat>("amp_attack", "Attack", 0.001f, 2.0f, 0.01f),
-			std::make_unique<AudioParameterFloat>("amp_decay", "Decay", 0.001f, 2.0f, 0.01f),
-			std::make_unique<AudioParameterFloat>("amp_sustain", "Sustain", 0.0f, 1.0f, 1.0f),
-			std::make_unique<AudioParameterFloat>("amp_release", "Release", 0.01f, 2.0f, 0.05f),
+            std::make_unique<AudioParameterFloat>("gain", "Gain", 0.0f, 1.0f, 0.6f),
+            std::make_unique<AudioParameterFloat>("amp_attack", "Attack", 0.001f, 2.0f, 0.01f),
+            std::make_unique<AudioParameterFloat>("amp_decay", "Decay", 0.001f, 2.0f, 0.01f),
+            std::make_unique<AudioParameterFloat>("amp_sustain", "Sustain", 0.0f, 1.0f, 1.0f),
+            std::make_unique<AudioParameterFloat>("amp_release", "Release", 0.01f, 2.0f, 0.05f),
 
             // filter parameters
-            std::make_unique<AudioParameterFloat>("cutoff", "Cufoff", 40.0f, 10000.0f, 4000.0f),
+            std::make_unique<AudioParameterInt>("filterType", "FilterType", 0, 2, 0),
+            std::make_unique<AudioParameterFloat>("cutoff", "Cufoff", frequencyRange(40.0f, 19000.0f, 0.01), 1000.0f),
             std::make_unique<AudioParameterFloat>("q", "Q", 0.01f, 5.0f, 1.0f),
+            std::make_unique<AudioParameterFloat>("envAmt", "Env", 0.0f, 1.0f, 1.0f),
             std::make_unique<AudioParameterFloat>("filter_attack", "Attack", 0.001f, 2.0f, 0.01f),
             std::make_unique<AudioParameterFloat>("filter_decay", "Decay", 0.001f, 2.0f, 0.01f),
             std::make_unique<AudioParameterFloat>("filter_sustain", "Sustain", 0.0f, 1.0f, 1.0f),
@@ -49,8 +56,10 @@ PolyWaveSynthAudioProcessor::PolyWaveSynthAudioProcessor() :
 	parameters.addParameterListener("amp_sustain", this);
 	parameters.addParameterListener("amp_release", this);
 
+    parameters.addParameterListener("filterType", this);
     parameters.addParameterListener("cutoff", this);
     parameters.addParameterListener("q", this);
+    parameters.addParameterListener("envAmt", this);
     parameters.addParameterListener("filter_attack", this);
     parameters.addParameterListener("filter_decay", this);
     parameters.addParameterListener("filter_sustain", this);
@@ -72,9 +81,11 @@ void PolyWaveSynthAudioProcessor::initParameters()
     auto* amp_release = parameters.getRawParameterValue("amp_release");
     synthEngine.setAmpADSR(*amp_attack, *amp_decay, *amp_sustain, *amp_release);
 
+    auto* filterType = parameters.getRawParameterValue("filterType");
     auto* cutoff = parameters.getRawParameterValue("cutoff");
     auto* q = parameters.getRawParameterValue("q");
-    synthEngine.setFilterParameters(State::Low_Pass, *cutoff, *q);
+    auto* envAmt = parameters.getRawParameterValue("envAmt");
+    synthEngine.setFilterParameters(static_cast<State>((int)*filterType), *cutoff, *q, *envAmt);
 
     auto* filter_attack = parameters.getRawParameterValue("filter_attack");
     auto* filter_decay = parameters.getRawParameterValue("filter_decay");
@@ -166,11 +177,14 @@ void PolyWaveSynthAudioProcessor::parameterChanged(const String& parameterID, fl
 
         initParameters();
 	}
-    else if (parameterID == "cutoff" || parameterID == "q")
+    else if (parameterID == "filterType" || parameterID == "cutoff" 
+        || parameterID == "q" || parameterID == "envAmt")
     {
+        auto* filterType = parameters.getRawParameterValue("filterType");
         auto* cutoff = parameters.getRawParameterValue("cutoff");
         auto* q = parameters.getRawParameterValue("q");
-        synthEngine.setFilterParameters(State::Low_Pass, *cutoff, *q);
+        auto* envAmt = parameters.getRawParameterValue("envAmt");
+        synthEngine.setFilterParameters(static_cast<State>((int)*filterType), *cutoff, *q, *envAmt);
     }
     else if (parameterID == "filter_attack" || parameterID == "filter_decay"
         || parameterID == "filter_sustain" || parameterID == "filter_release")

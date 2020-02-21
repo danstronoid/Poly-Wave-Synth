@@ -22,7 +22,7 @@ public:
 	void setAmpADSR(float attack, float decay, float sustain, float release);
 	void setOscType(WaveType type);
 
-	void setFilterParameters(State state, double cutoff, double q);
+	void setFilterParameters(State state, double cutoff, double q, float envAmt);
 	void setFilterADSR(float attack, float decay, float sustain, float release);
 
 private:

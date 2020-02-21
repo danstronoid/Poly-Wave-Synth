@@ -12,6 +12,7 @@
 
 #include "../JuceLibraryCode/JuceHeader.h"
 typedef AudioProcessorValueTreeState::SliderAttachment SliderAttachment;
+typedef AudioProcessorValueTreeState::ComboBoxAttachment ComboBoxAttachment;
 
 //==============================================================================
 /*
@@ -25,7 +26,8 @@ public:
         setSize(200, 200);
 
         cutoffSlider.setSliderStyle(Slider::RotaryHorizontalVerticalDrag);
-        cutoffSlider.setTextBoxStyle(Slider::TextBoxBelow, false, 60, 20);
+        cutoffSlider.setTextBoxStyle(Slider::NoTextBox, true, 0, 0);
+        cutoffSlider.setPopupDisplayEnabled(true, false, this);
         addAndMakeVisible(&cutoffSlider);
         cutoffAttach.reset(new SliderAttachment(parameters, "cutoff", cutoffSlider));
         cutoffLabel.setText("Cutoff", dontSendNotification);
@@ -34,7 +36,8 @@ public:
         cutoffLabel.attachToComponent(&cutoffSlider, false);
 
         qSlider.setSliderStyle(Slider::RotaryHorizontalVerticalDrag);
-        qSlider.setTextBoxStyle(Slider::TextBoxBelow, false, 60, 20);
+        qSlider.setTextBoxStyle(Slider::NoTextBox, true, 0, 0); 
+        qSlider.setPopupDisplayEnabled(true, false, this);
         addAndMakeVisible(&qSlider);
         qAttach.reset(new SliderAttachment(parameters, "q", qSlider));
         qLabel.setText("Q", dontSendNotification);
@@ -42,6 +45,25 @@ public:
         addAndMakeVisible(&qLabel);
         qLabel.attachToComponent(&qSlider, false);
 
+        envAmtSlider.setSliderStyle(Slider::RotaryHorizontalVerticalDrag);
+        envAmtSlider.setTextBoxStyle(Slider::NoTextBox, true, 0, 0);
+        envAmtSlider.setPopupDisplayEnabled(true, false, this);
+        addAndMakeVisible(&envAmtSlider);
+        envAmtAttach.reset(new SliderAttachment(parameters, "envAmt", envAmtSlider));
+        envAmtLabel.setText("Env", dontSendNotification);
+        envAmtLabel.setJustificationType(Justification::centred);
+        addAndMakeVisible(&qLabel);
+        envAmtLabel.attachToComponent(&envAmtSlider, false);
+
+        filterType.addItem("Low Pass", 1); 
+        filterType.addItem("High Pass", 2);
+        filterType.addItem("Band Pass", 3);
+        addAndMakeVisible(&filterType);
+        filterTypeAttach.reset(new ComboBoxAttachment(parameters, "filterType", filterType));
+        filterTypeLabel.setText("Filter Type", dontSendNotification);
+        filterTypeLabel.setJustificationType(Justification::centred);
+        addAndMakeVisible(&filterTypeLabel);
+        filterTypeLabel.attachToComponent(&filterType, false);
     }
 
     ~FilterGUI()
@@ -62,16 +84,21 @@ public:
 
     void resized() override
     {
-        const int padding = 20;
-        Rectangle<int> area = getLocalBounds();
-        int sliderWidth = area.getWidth() / 2;
-        int sliderHeight = area.getHeight() / 2;
+        const int padding = 10;
+        Rectangle<int> area = getLocalBounds().reduced(padding);
+        int sliderWidth = area.getWidth() / 3;
+        int sliderHeight = area.getHeight() / 3;
         //remove space for the label
         area.removeFromTop(padding * 2);
 
-        cutoffSlider.setBounds(area.removeFromRight(sliderWidth).removeFromTop(sliderHeight));
-        qSlider.setBounds(area.removeFromRight(sliderWidth).removeFromTop(sliderHeight));
+        cutoffSlider.setBounds(area.removeFromLeft(sliderWidth).removeFromTop(sliderHeight));
+        qSlider.setBounds(area.removeFromLeft(sliderWidth).removeFromTop(sliderHeight));
+        envAmtSlider.setBounds(area.removeFromLeft(sliderWidth).removeFromTop(sliderHeight));
 
+        area = getLocalBounds().reduced(padding);
+        area.removeFromTop(sliderHeight + padding * 4);
+        filterType.setBounds(area.removeFromLeft(sliderWidth * 2).removeFromTop(padding * 2));
+        
     }
 
 private:
@@ -79,12 +106,18 @@ private:
 
     Slider cutoffSlider;
     Slider qSlider;
+    Slider envAmtSlider;
+    ComboBox filterType;
 
     Label cutoffLabel;
     Label qLabel;
+    Label envAmtLabel;
+    Label filterTypeLabel;
 
     std::unique_ptr<SliderAttachment> cutoffAttach;
     std::unique_ptr<SliderAttachment> qAttach;
+    std::unique_ptr<SliderAttachment> envAmtAttach;
+    std::unique_ptr<ComboBoxAttachment> filterTypeAttach;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (FilterGUI)
 };

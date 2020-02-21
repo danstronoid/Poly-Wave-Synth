@@ -74,7 +74,7 @@ void WaveTableVoice::renderNextBlock(AudioBuffer<float>& outputBuffer, int start
 		while (--numSamples >= 0)
 		{
 			float ampEnvValue = m_ampADSR.getNextSample();
-			float filterEnvValue = m_filterADSR.getNextSample();
+			float filterEnvValue = m_filterADSR.getNextSample() * m_envAmt + (1 - m_envAmt);
 
 			if (!m_ampADSR.isActive())
 			{

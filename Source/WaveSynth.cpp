@@ -42,12 +42,13 @@ void WaveSynthEngine::setOscType(WaveType type)
 	}
 }
 
-void WaveSynthEngine::setFilterParameters(State state, double cutoff, double q)
+void WaveSynthEngine::setFilterParameters(State state, double cutoff, double q, float envAmt)
 {
 	for (int i = 0; i < getNumVoices(); ++i)
 	{
 		auto* voice = dynamic_cast<WaveTableVoice*>(getVoice(i));
 		voice->m_svf.setParameters(state, cutoff, q);
+		voice->m_envAmt = envAmt;
 	}
 }
 

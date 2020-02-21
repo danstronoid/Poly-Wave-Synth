@@ -33,6 +33,7 @@ public:
 	StateVariableFilter m_svf;
 	Envelope m_ampADSR;
 	Envelope m_filterADSR;
+	float m_envAmt{ 0.0f };
 
 private:
 	// maintain a reference to the tableGenerator owned by the WaveSynthEngine
