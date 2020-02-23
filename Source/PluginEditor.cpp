@@ -14,14 +14,15 @@
 //==============================================================================
 PolyWaveSynthAudioProcessorEditor::PolyWaveSynthAudioProcessorEditor (PolyWaveSynthAudioProcessor& p, AudioProcessorValueTreeState& vts)
     : AudioProcessorEditor (&p), processor (p), parameters (vts), 
-    ampEnvGUI(vts), oscGUI(vts), filterGUI(vts), filterEnvGUI(vts)
+    ampEnvGUI(vts), oscGUI(vts), filterGUI(vts), filterEnvGUI(vts), fmGUI(vts)
 {
-    setSize (componentWidth * 3, componentHeight * 2);
+    setSize (componentWidth * 3 + padding * 2, componentHeight * 2 + padding * 4);
 
     addAndMakeVisible(&ampEnvGUI);
     addAndMakeVisible(&oscGUI);
     addAndMakeVisible(&filterGUI);
     addAndMakeVisible(&filterEnvGUI);
+    addAndMakeVisible(&fmGUI);
 }
 
 PolyWaveSynthAudioProcessorEditor::~PolyWaveSynthAudioProcessorEditor()
@@ -34,22 +35,28 @@ void PolyWaveSynthAudioProcessorEditor::paint (Graphics& g)
     // (Our component is opaque, so we must completely fill the background with a solid colour)
     g.fillAll (Colours::black);
 
-    Rectangle<float> box(componentWidth * 2.0f, componentHeight);
+    //Rectangle<float> smBox(componentWidth, componentHeight);
+    Rectangle<float> box(componentWidth * 3.0f, componentHeight);
     g.setColour(Colours::darkgrey);
+    box.setPosition(padding, padding * 2);
     g.fillRoundedRectangle(box, 10);
 
     g.setColour(Colours::darkslategrey);
-    box.setPosition(0, componentHeight);
+    box.setPosition(padding, componentHeight + padding * 2);
     g.fillRoundedRectangle(box, 10);
 }
 
 void PolyWaveSynthAudioProcessorEditor::resized()
 {
-    Rectangle<int> area = getLocalBounds();
+    Rectangle<int> area = getLocalBounds().reduced(padding);
+    area.removeFromTop(padding);
     oscGUI.setBounds(area.removeFromLeft(componentWidth).removeFromTop(componentHeight));
     ampEnvGUI.setBounds(area.removeFromLeft(componentWidth).removeFromTop(componentHeight));
+    fmGUI.setBounds(area.removeFromLeft(componentWidth).removeFromTop(componentHeight));
 
-    area = getLocalBounds();
-    filterGUI.setBounds(area.removeFromLeft(componentWidth).removeFromBottom(componentHeight));
-    filterEnvGUI.setBounds(area.removeFromLeft(componentWidth).removeFromBottom(componentHeight));
+    area = getLocalBounds().reduced(padding);
+    area.removeFromTop(componentHeight + padding);
+    filterGUI.setBounds(area.removeFromLeft(componentWidth).removeFromTop(componentHeight));
+    filterEnvGUI.setBounds(area.removeFromLeft(componentWidth).removeFromTop(componentHeight));
+    
 }

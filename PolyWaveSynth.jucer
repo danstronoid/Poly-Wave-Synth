@@ -6,12 +6,16 @@
   <MAINGROUP id="wq10Q0" name="PolyWaveSynth">
     <GROUP id="{A410D81D-2AA3-5DA7-F626-6F259D649C9A}" name="Source">
       <GROUP id="{C2DF9C4A-BFED-A1E9-F3AB-6ED9A705830B}" name="GUI">
+        <FILE id="rBY4fS" name="DelayGUI.h" compile="0" resource="0" file="Source/DelayGUI.h"/>
+        <FILE id="v1Hsiy" name="FmGUI.h" compile="0" resource="0" file="Source/FmGUI.h"/>
         <FILE id="jj4X0Y" name="FilterGUI.h" compile="0" resource="0" file="Source/FilterGUI.h"/>
         <FILE id="fgRAE5" name="AmpEnvGUI.h" compile="0" resource="0" file="Source/AmpEnvGUI.h"/>
         <FILE id="Fm6Aln" name="OscGUI.h" compile="0" resource="0" file="Source/OscGUI.h"/>
         <FILE id="oA50Mj" name="FilterEnvGUI.h" compile="0" resource="0" file="Source/FilterEnvGUI.h"/>
       </GROUP>
       <GROUP id="{5D13ABFA-8F51-338E-BD3D-AC8C56BFA2B6}" name="DSP">
+        <FILE id="TLTmMr" name="Oscillator.h" compile="0" resource="0" file="Source/Oscillator.h"/>
+        <FILE id="kM9lQy" name="Delay.h" compile="0" resource="0" file="Source/Delay.h"/>
         <FILE id="jLqd8a" name="StateVariableFilter.h" compile="0" resource="0"
               file="Source/StateVariableFilter.h"/>
         <FILE id="YjUTZT" name="WaveSynth.cpp" compile="1" resource="0" file="Source/WaveSynth.cpp"/>
@@ -24,7 +28,6 @@
               file="Source/WaveTableVoice.cpp"/>
         <FILE id="wwRrHA" name="WaveTableVoice.h" compile="0" resource="0"
               file="Source/WaveTableVoice.h"/>
-        <FILE id="Sqeidb" name="Filter.cpp" compile="1" resource="0" file="Source/Filter.cpp"/>
         <FILE id="v2nlME" name="Filter.h" compile="0" resource="0" file="Source/Filter.h"/>
         <FILE id="f7t9x1" name="Envelope.cpp" compile="1" resource="0" file="Source/Envelope.cpp"/>
         <FILE id="LMkRRg" name="Envelope.h" compile="0" resource="0" file="Source/Envelope.h"/>

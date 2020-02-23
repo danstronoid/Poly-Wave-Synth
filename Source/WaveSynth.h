@@ -20,17 +20,20 @@ public:
 	WaveSynthEngine();
 
 	void setOscType(WaveType type);
-	void setOscParameters(float noise);
+	void setFMOscType(WaveType type);
+
+	void setOscParameters(float noise, float freq);
+	void setModParameters(float multi, float depth, float freq);
 	void setAmpADSR(float attack, float decay, float sustain, float release);
-	
 
 	void setFilterParameters(State state, double cutoff, double q, float envAmt);
 	void setFilterADSR(float attack, float decay, float sustain, float release);
 
 private:
 	WaveTableGenerator m_tableGenerator;
-	const int m_maxVoices{ 16 };
-	WaveType m_waveType{ SINE };
+	const int m_maxVoices{ 8 };
+	WaveType m_waveType{ WaveType::SINE };
+	WaveType m_fmWaveType{ WaveType::SINE };
 };
 
 //==============================================================================

@@ -36,9 +36,9 @@ public:
         calculateCoef();
     }
 
-    void update(double modulator)
+    void update(double env = 1, double mod = 0)
     {
-        m_cutoff = m_targetCutoff * modulator;
+        m_cutoff = fmax(40, m_targetCutoff * env + mod);
         calculateCoef();
     }
 

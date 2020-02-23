@@ -24,10 +24,15 @@ PolyWaveSynthAudioProcessor::PolyWaveSynthAudioProcessor() :
             std::make_unique<AudioParameterInt>("oscType", "OscType", 0, 3, 0),
             std::make_unique<AudioParameterFloat>("gain", "Gain", 0.0f, 1.0f, 0.6f),
             std::make_unique<AudioParameterFloat>("noise", "Noise", 0.0f, 0.3f, 0.0f),
+            std::make_unique<AudioParameterFloat>("osc_freq", "OscFreq", frequencyRange(40.0f, 12000.0f, 0.01), 40.0f),
             std::make_unique<AudioParameterFloat>("amp_attack", "Attack", 0.001f, 2.0f, 0.01f),
             std::make_unique<AudioParameterFloat>("amp_decay", "Decay", 0.001f, 2.0f, 0.01f),
             std::make_unique<AudioParameterFloat>("amp_sustain", "Sustain", 0.0f, 1.0f, 1.0f),
             std::make_unique<AudioParameterFloat>("amp_release", "Release", 0.01f, 2.0f, 0.05f),
+            std::make_unique<AudioParameterInt>("fm_oscType", "FMOscType", 0, 3, 0),
+            std::make_unique<AudioParameterFloat>("fm_multi", "Multi", 0.0f, 4.0f, 1.0f),
+            std::make_unique<AudioParameterFloat>("fm_freq", "FMFreq", frequencyRange(40.0f, 12000.0f, 0.01), 40.0f),
+            std::make_unique<AudioParameterFloat>("fm_depth", "Depth", 0.0f, 1.0f, 0.0f),
 
             // filter parameters
             std::make_unique<AudioParameterInt>("filterType", "FilterType", 0, 2, 0),
@@ -37,7 +42,7 @@ PolyWaveSynthAudioProcessor::PolyWaveSynthAudioProcessor() :
             std::make_unique<AudioParameterFloat>("filter_attack", "Attack", 0.001f, 2.0f, 0.01f),
             std::make_unique<AudioParameterFloat>("filter_decay", "Decay", 0.001f, 2.0f, 0.01f),
             std::make_unique<AudioParameterFloat>("filter_sustain", "Sustain", 0.0f, 1.0f, 1.0f),
-            std::make_unique<AudioParameterFloat>("filter_release", "Release", 0.01f, 2.0f, 0.05f)
+            std::make_unique<AudioParameterFloat>("filter_release", "Release", 0.01f, 2.0f, 0.05f),
 		}),
 #ifndef JucePlugin_PreferredChannelConfigurations
 	AudioProcessor(BusesProperties()
@@ -50,14 +55,21 @@ PolyWaveSynthAudioProcessor::PolyWaveSynthAudioProcessor() :
 	)
 #endif
 {
+    // Osc parameter listeners
     parameters.addParameterListener("oscType", this);
 	parameters.addParameterListener("gain", this);
     parameters.addParameterListener("noise", this);
+    parameters.addParameterListener("osc_freq", this);
 	parameters.addParameterListener("amp_attack", this);
 	parameters.addParameterListener("amp_decay", this);
 	parameters.addParameterListener("amp_sustain", this);
 	parameters.addParameterListener("amp_release", this);
+    parameters.addParameterListener("fm_oscType", this);
+    parameters.addParameterListener("fm_multi", this);
+    parameters.addParameterListener("fm_freq", this);
+    parameters.addParameterListener("fm_depth", this);
 
+    // Filter parameter listeners
     parameters.addParameterListener("filterType", this);
     parameters.addParameterListener("cutoff", this);
     parameters.addParameterListener("q", this);
@@ -78,7 +90,13 @@ void PolyWaveSynthAudioProcessor::initParameters()
 {
     // this is a cheeky way of initializing values, probably a better way
     auto* noise = parameters.getRawParameterValue("noise");
-    synthEngine.setOscParameters(*noise);
+    auto* osc_freq = parameters.getRawParameterValue("osc_freq");
+    synthEngine.setOscParameters(*noise, *osc_freq);
+
+    auto* fm_multi = parameters.getRawParameterValue("fm_multi");
+    auto* fm_freq = parameters.getRawParameterValue("fm_freq");
+    auto* fm_depth = parameters.getRawParameterValue("fm_depth");
+    synthEngine.setModParameters(*fm_multi, *fm_depth, *fm_freq);
 
     auto* amp_attack = parameters.getRawParameterValue("amp_attack");
     auto* amp_decay = parameters.getRawParameterValue("amp_decay");
@@ -97,6 +115,70 @@ void PolyWaveSynthAudioProcessor::initParameters()
     auto* filter_sustain = parameters.getRawParameterValue("filter_sustain");
     auto* filter_release = parameters.getRawParameterValue("filter_release");
     synthEngine.setFilterADSR(*filter_attack, *filter_decay, *filter_sustain, *filter_release);
+}
+
+// callback for when a parameter is changed
+void PolyWaveSynthAudioProcessor::parameterChanged(const String& parameterID, float newValue)
+{
+    // osc
+    if (parameterID == "oscType")
+    {
+    int index = newValue;
+    synthEngine.setOscType(static_cast<WaveType>(index));
+
+    initParameters();
+    }
+    else if (parameterID == "fm_oscType")
+    {
+        int index = newValue;
+        synthEngine.setFMOscType(static_cast<WaveType>(index));
+
+        initParameters();
+    }
+    else if (parameterID == "fm_multi" || parameterID == "fm_depth" || parameterID == "fm_freq")
+    {
+        auto* fm_multi = parameters.getRawParameterValue("fm_multi");
+        auto* fm_freq = parameters.getRawParameterValue("fm_freq");
+        auto* fm_depth = parameters.getRawParameterValue("fm_depth");
+        synthEngine.setModParameters(*fm_multi, *fm_depth, *fm_freq);
+    }
+    else if (parameterID == "amp_attack" || parameterID == "amp_decay"
+        || parameterID == "amp_sustain" || parameterID == "amp_release")
+    {
+        auto* amp_attack = parameters.getRawParameterValue("amp_attack");
+        auto* amp_decay = parameters.getRawParameterValue("amp_decay");
+        auto* amp_sustain = parameters.getRawParameterValue("amp_sustain");
+        auto* amp_release = parameters.getRawParameterValue("amp_release");
+        synthEngine.setAmpADSR(*amp_attack, *amp_decay, *amp_sustain, *amp_release);
+    }
+    else if (parameterID == "gain")
+        currentGain = newValue;
+    else if (parameterID == "noise" || parameterID == "osc_freq")
+    {
+        auto* noise = parameters.getRawParameterValue("noise");
+        auto* osc_freq = parameters.getRawParameterValue("osc_freq");
+        synthEngine.setOscParameters(*noise, *osc_freq);
+    }
+
+    // filter
+    else if (parameterID == "filterType" || parameterID == "cutoff"
+        || parameterID == "q" || parameterID == "envAmt")
+    {
+        auto* filterType = parameters.getRawParameterValue("filterType");
+        auto* cutoff = parameters.getRawParameterValue("cutoff");
+        auto* q = parameters.getRawParameterValue("q");
+        auto* envAmt = parameters.getRawParameterValue("envAmt");
+        synthEngine.setFilterParameters(static_cast<State>((int)*filterType), *cutoff, *q, *envAmt);
+    }
+    else if (parameterID == "filter_attack" || parameterID == "filter_decay"
+        || parameterID == "filter_sustain" || parameterID == "filter_release")
+    {
+        auto* filter_attack = parameters.getRawParameterValue("filter_attack");
+        auto* filter_decay = parameters.getRawParameterValue("filter_decay");
+        auto* filter_sustain = parameters.getRawParameterValue("filter_sustain");
+        auto* filter_release = parameters.getRawParameterValue("filter_release");
+        synthEngine.setFilterADSR(*filter_attack, *filter_decay, *filter_sustain, *filter_release);
+    }
 }
 
 //==============================================================================
@@ -162,55 +244,10 @@ void PolyWaveSynthAudioProcessor::changeProgramName (int index, const String& ne
 }
 
 //==============================================================================
-void PolyWaveSynthAudioProcessor::parameterChanged(const String& parameterID, float newValue)
-{
-    if (parameterID == "amp_attack" || parameterID == "amp_decay"
-        || parameterID == "amp_sustain" || parameterID == "amp_release")
-    {
-        auto* amp_attack = parameters.getRawParameterValue("amp_attack");
-        auto* amp_decay = parameters.getRawParameterValue("amp_decay");
-        auto* amp_sustain = parameters.getRawParameterValue("amp_sustain");
-        auto* amp_release = parameters.getRawParameterValue("amp_release");
-        synthEngine.setAmpADSR(*amp_attack, *amp_decay, *amp_sustain, *amp_release);
-    }
-	else if (parameterID == "gain")
-		currentGain = newValue;
-    else if (parameterID == "noise")
-    {
-        auto* noise = parameters.getRawParameterValue("noise");
-        synthEngine.setOscParameters(*noise);
-    }
-	else if (parameterID == "oscType")
-	{
-        int index = newValue;
-		synthEngine.setOscType(static_cast<WaveType>(index));
-
-        initParameters();
-	}
-    else if (parameterID == "filterType" || parameterID == "cutoff" 
-        || parameterID == "q" || parameterID == "envAmt")
-    {
-        auto* filterType = parameters.getRawParameterValue("filterType");
-        auto* cutoff = parameters.getRawParameterValue("cutoff");
-        auto* q = parameters.getRawParameterValue("q");
-        auto* envAmt = parameters.getRawParameterValue("envAmt");
-        synthEngine.setFilterParameters(static_cast<State>((int)*filterType), *cutoff, *q, *envAmt);
-    }
-    else if (parameterID == "filter_attack" || parameterID == "filter_decay"
-        || parameterID == "filter_sustain" || parameterID == "filter_release")
-    {
-        auto* filter_attack = parameters.getRawParameterValue("filter_attack");
-        auto* filter_decay = parameters.getRawParameterValue("filter_decay");
-        auto* filter_sustain = parameters.getRawParameterValue("filter_sustain");
-        auto* filter_release = parameters.getRawParameterValue("filter_release");
-        synthEngine.setFilterADSR(*filter_attack, *filter_decay, *filter_sustain, *filter_release);
-    }
-}
 
 void PolyWaveSynthAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
 {
-	synthEngine.setCurrentPlaybackSampleRate(sampleRate);
-    
+	synthEngine.setCurrentPlaybackSampleRate(sampleRate);    
 }
 
 void PolyWaveSynthAudioProcessor::releaseResources()

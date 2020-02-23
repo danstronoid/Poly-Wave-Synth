@@ -44,6 +44,11 @@ public:
         addAndMakeVisible(&envAmtSlider);
         envAmtAttach.reset(new SliderAttachment(parameters, "envAmt", envAmtSlider));
 
+        /*modAmtSlider.setSliderStyle(Slider::RotaryHorizontalVerticalDrag);
+        modAmtSlider.setTextBoxStyle(Slider::NoTextBox, true, 0, 0);
+        modAmtSlider.setPopupDisplayEnabled(true, false, this);
+        addAndMakeVisible(&modAmtSlider);*/
+
         filterType.addItem("LP", 1); 
         filterType.addItem("HP", 2);
         filterType.addItem("BP", 3);
@@ -64,8 +69,13 @@ public:
 
         envAmtLabel.setText("Env", dontSendNotification);
         envAmtLabel.setJustificationType(Justification::centred);
-        addAndMakeVisible(&qLabel);
+        addAndMakeVisible(&envAmtLabel);
         envAmtLabel.attachToComponent(&envAmtSlider, false);
+
+        /*modAmtLabel.setText("Env", dontSendNotification);
+        modAmtLabel.setJustificationType(Justification::centred);
+        addAndMakeVisible(&modAmtLabel);
+        modAmtLabel.attachToComponent(&modAmtSlider, false);*/
 
         filterLabel.setText("Filter", dontSendNotification);
         filterLabel.setFont(Font(20.0f, Font::bold));
@@ -102,7 +112,7 @@ public:
         // top half
         area.removeFromTop(padding);
         filterLabel.setBounds(area.removeFromLeft(boxWidth).removeFromTop(rotaryHeight));
-        Rectangle<int> boxArea = area.removeFromRight(boxWidth).removeFromTop(rotaryHeight);
+        Rectangle<int> boxArea = area.removeFromLeft(boxWidth * 2).removeFromTop(rotaryHeight);
         filterType.setBounds(boxArea.getX(), boxArea.getY() + boxArea.getHeight() / 2 - boxHeight / 2,
             boxArea.getWidth(), boxHeight);
 
@@ -122,16 +132,19 @@ private:
     Slider cutoffSlider;
     Slider qSlider;
     Slider envAmtSlider;
+    //Slider modAmtSlider;
     ComboBox filterType;
 
     Label cutoffLabel;
     Label qLabel;
     Label envAmtLabel;
+    //Label modAmtLabel;
     Label filterLabel;
 
     std::unique_ptr<SliderAttachment> cutoffAttach;
     std::unique_ptr<SliderAttachment> qAttach;
     std::unique_ptr<SliderAttachment> envAmtAttach;
+    //std::unique_ptr<SliderAttachment> modAmtAttach;
     std::unique_ptr<ComboBoxAttachment> filterTypeAttach;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (FilterGUI)

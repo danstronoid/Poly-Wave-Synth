@@ -16,6 +16,7 @@
 #include "OscGUI.h"
 #include "FilterGUI.h"
 #include "FilterEnvGUI.h"
+#include "FmGUI.h"
 
 typedef AudioProcessorValueTreeState::SliderAttachment SliderAttachment;
 
@@ -42,9 +43,11 @@ private:
     OscGUI oscGUI;
     FilterGUI filterGUI;
     FilterEnvGUI filterEnvGUI;
+    FmGUI fmGUI;
 
     const int componentWidth = 200;
     const int componentHeight = 200;
+    const int padding = 0;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (PolyWaveSynthAudioProcessorEditor)
 };

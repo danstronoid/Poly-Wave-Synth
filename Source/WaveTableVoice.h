@@ -13,10 +13,11 @@
 #include "../JuceLibraryCode/JuceHeader.h"
 #include "Envelope.h"
 #include "StateVariableFilter.h"
+#include "Oscillator.h"
 
-class WaveTableVoice : public SynthesiserVoice {
-public:
-	WaveTableVoice(const std::vector<AudioSampleBuffer>& tables);
+// these are implemented as structs for ease of changing parameters
+struct WaveTableVoice : public SynthesiserVoice {
+	WaveTableVoice(const std::vector<AudioSampleBuffer>& oscTables, const std::vector<AudioSampleBuffer>& modTables);
 
 	bool isVoiceActive() const override;
 	bool canPlaySound(SynthesiserSound* sound) override;
@@ -29,31 +30,20 @@ public:
 	void pitchWheelMoved(int /*newPitchWheelValue*/) override;
 	void controllerMoved(int /*controllerNumber*/, int /*newControllerValue*/) override;
 
-	// these are public for ease of changing parameters
+	Random random;
+	Oscillator m_osc;
+	Oscillator m_fmOsc;
 	StateVariableFilter m_svf;
 	Envelope m_ampADSR;
 	Envelope m_filterADSR;
+
 	float m_envAmt{ 0.0f };
-	float m_level{ 0.0f };
 	float m_noise{ 0.0f };
-
-private:
-	// maintain a reference to the tableGenerator owned by the WaveSynthEngine
-	//const AudioSampleBuffer& m_table;
-
-	const std::vector<AudioSampleBuffer>& m_tables;
-	int m_octave{};
-
-	int m_tableSize{};
-	float m_tablePos{ 0.0f };
-	float m_tableDelta{ 0.0f };
-
-	Random random;
 };
 
 //==============================================================================
 
-class WaveTableSound : public SynthesiserSound {
+struct WaveTableSound : public SynthesiserSound {
 public:
 	WaveTableSound();
 

@@ -12,7 +12,7 @@
 
 #include "../JuceLibraryCode/JuceHeader.h"
 
-enum WaveType
+enum class WaveType
 {
 	SINE = 0,
 	SQUARE = 1,

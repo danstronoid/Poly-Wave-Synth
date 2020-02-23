@@ -10,9 +10,13 @@
 
 #include "WaveTableVoice.h"
 
-WaveTableVoice::WaveTableVoice(const std::vector<AudioSampleBuffer>& tables) :
-	m_tables(tables)
+WaveTableVoice::WaveTableVoice(const std::vector<AudioSampleBuffer>& oscTables, const std::vector<AudioSampleBuffer>& modTables) :
+	m_osc(oscTables), m_fmOsc(modTables)
 {
+	m_osc.setSampleRate(getSampleRate());
+	m_fmOsc.setSampleRate(getSampleRate());
+	m_fmOsc.setParameters(0, 1);
+
 	m_svf.setSampleRate(getSampleRate());
 	m_svf.setParameters(State::Low_Pass, 400, 1);
 
@@ -35,17 +39,9 @@ bool WaveTableVoice::canPlaySound(SynthesiserSound* sound)
 
 void WaveTableVoice::startNote(int midiNoteNumber, float velocity, SynthesiserSound* sound,
 	int /*currentPitchWheelPosition*/)
-{
-	m_tablePos = 0;
-	m_level = velocity * 0.3f;
-
-	m_octave = midiNoteNumber / 12 - 1;
-	m_tableSize = m_tables[m_octave].getNumSamples() - 1;
-
-	float frequency = MidiMessage::getMidiNoteInHertz(midiNoteNumber);
-	float sizeOverSR = (float)m_tableSize / getSampleRate();
-	m_tableDelta = frequency * sizeOverSR;
-
+{	
+	m_osc.noteOn(midiNoteNumber, velocity);
+	m_fmOsc.noteOn(midiNoteNumber, velocity);
 	m_ampADSR.noteOn();
 	m_filterADSR.noteOn();
 }
@@ -62,49 +58,40 @@ void WaveTableVoice::stopNote(float velocity, bool allowTailOff)
 		m_ampADSR.reset();
 		m_filterADSR.reset();
 		clearCurrentNote();
-		m_tableDelta = 0;
+		m_osc.reset();
 	}
 }
 
 void WaveTableVoice::renderNextBlock(AudioBuffer<float>& outputBuffer, int startSample, int numSamples)
 {
-	if (m_tableDelta != 0)
+	if (m_osc.isActive())
 	{
 
 		while (--numSamples >= 0)
 		{
-			float ampEnvValue = m_ampADSR.getNextSample();
-			float filterEnvValue = m_filterADSR.getNextSample() * m_envAmt + (1 - m_envAmt);
-
 			if (!m_ampADSR.isActive())
 			{
 				m_ampADSR.reset();
 				m_filterADSR.reset();
 				clearCurrentNote();
-				m_tableDelta = 0;
+				m_osc.reset();
 			}
+			float fmValue = m_fmOsc.getNextSample();
 
-			int index0 = (int)m_tablePos;
-			int index1 = index0 + 1;
+			m_osc.calculateDelta(fmValue);
 
-			float frac = m_tablePos - (float)index0;
+			float currentSample = m_osc.getNextSample();
 
-			const float* table = m_tables[m_octave].getReadPointer(0);
-			float value0 = table[index0];
-			float value1 = table[index1];
-
-			float currentSample = value0 + frac * (value1 - value0);
+			float ampEnvValue = m_ampADSR.getNextSample();
+			float filterEnvValue = m_filterADSR.getNextSample() * m_envAmt + (1 - m_envAmt);
 
 			float noise = random.nextFloat() * m_noise - (m_noise / 2);
 
 			m_svf.update(filterEnvValue);
-			currentSample = m_svf.renderSample(currentSample * m_level + noise);
+			currentSample = m_svf.renderSample(currentSample + noise);
 
 			for (auto channel = outputBuffer.getNumChannels(); --channel >= 0;)
 				outputBuffer.addSample(channel, startSample, currentSample * ampEnvValue);
-
-			if ((m_tablePos += m_tableDelta) > m_tableSize)
-				m_tablePos -= m_tableSize;
 
 			++startSample;
 		}

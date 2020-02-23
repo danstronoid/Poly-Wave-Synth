@@ -1,8 +1,8 @@
 /*
   ==============================================================================
 
-    OscGUI.h
-    Created: 18 Feb 2020 4:32:07pm
+    ModGUI.h
+    Created: 22 Feb 2020 9:33:44am
     Author:  Daniel Schwartz
 
   ==============================================================================
@@ -17,64 +17,65 @@ typedef AudioProcessorValueTreeState::ComboBoxAttachment ComboBoxAttachment;
 //==============================================================================
 /*
 */
-class OscGUI    : public Component
+class FmGUI    : public Component
 {
 public:
-    OscGUI(AudioProcessorValueTreeState& vts) :
+    FmGUI(AudioProcessorValueTreeState& vts) :
         parameters(vts)
     {
         setSize(200, 200);
 
-        // Sliders
+        // Box
         oscType.addItem("Sine", 1);
         oscType.addItem("Square", 2);
         oscType.addItem("Saw", 3);
         oscType.addItem("Tri", 4);
         oscType.setJustificationType(Justification::centred);
         addAndMakeVisible(&oscType);
-        oscTypeAttach.reset(new ComboBoxAttachment(parameters, "oscType", oscType));
+        oscTypeAttach.reset(new ComboBoxAttachment(parameters, "fm_oscType", oscType));
 
-        gainSlider.setSliderStyle(Slider::RotaryHorizontalVerticalDrag);
-        gainSlider.setTextBoxStyle(Slider::NoTextBox, true, 0, 0);
-        gainSlider.setPopupDisplayEnabled(true, false, this);
-        addAndMakeVisible(&gainSlider);
-        gainAttach.reset(new SliderAttachment(parameters, "gain", gainSlider));
-
-        noiseSlider.setSliderStyle(Slider::RotaryHorizontalVerticalDrag);
-        noiseSlider.setTextBoxStyle(Slider::NoTextBox, true, 0, 0);
-        noiseSlider.setPopupDisplayEnabled(true, false, this);
-        addAndMakeVisible(&noiseSlider);
-        noiseAttach.reset(new SliderAttachment(parameters, "noise", noiseSlider));
+        // Sliders
+        multiSlider.setSliderStyle(Slider::RotaryHorizontalVerticalDrag);
+        multiSlider.setTextBoxStyle(Slider::NoTextBox, true, 0, 0);
+        multiSlider.setPopupDisplayEnabled(true, false, this);
+        addAndMakeVisible(&multiSlider);
+        multiAttach.reset(new SliderAttachment(parameters, "fm_multi", multiSlider));
 
         freqSlider.setSliderStyle(Slider::RotaryHorizontalVerticalDrag);
         freqSlider.setTextBoxStyle(Slider::NoTextBox, true, 0, 0);
         freqSlider.setPopupDisplayEnabled(true, false, this);
         addAndMakeVisible(&freqSlider);
-        freqAttach.reset(new SliderAttachment(parameters, "osc_freq", freqSlider));
+        freqAttach.reset(new SliderAttachment(parameters, "fm_freq", freqSlider));
+
+        depthSlider.setSliderStyle(Slider::RotaryHorizontalVerticalDrag);
+        depthSlider.setTextBoxStyle(Slider::NoTextBox, true, 0, 0);
+        depthSlider.setPopupDisplayEnabled(true, false, this);
+        addAndMakeVisible(&depthSlider);
+        depthAttach.reset(new SliderAttachment(parameters, "fm_depth", depthSlider));
 
         // Labels
-        oscLabel.setText("Osc", dontSendNotification);
-        oscLabel.setFont(Font(20.0f, Font::bold));
-        oscLabel.setJustificationType(Justification::centred);
-        addAndMakeVisible(&oscLabel);
+        fmLabel.setText("FM", dontSendNotification);
+        fmLabel.setFont(Font(20.0f, Font::bold));
+        fmLabel.setJustificationType(Justification::centred);
+        addAndMakeVisible(&fmLabel);
 
-        gainLabel.setText("Gain", dontSendNotification);
-        gainLabel.setJustificationType(Justification::centred);
-        addAndMakeVisible(&gainLabel);
-        gainLabel.attachToComponent(&gainSlider, false);
-
-        noiseLabel.setText("Noise", dontSendNotification);
-        noiseLabel.setJustificationType(Justification::centred);
-        addAndMakeVisible(&noiseLabel);
-        noiseLabel.attachToComponent(&noiseSlider, false);
+        multiLabel.setText("Multi", dontSendNotification);
+        multiLabel.setJustificationType(Justification::centred);
+        addAndMakeVisible(&multiLabel);
+        multiLabel.attachToComponent(&multiSlider, false);
 
         freqLabel.setText("Freq", dontSendNotification);
         freqLabel.setJustificationType(Justification::centred);
         addAndMakeVisible(&freqLabel);
         freqLabel.attachToComponent(&freqSlider, false);
+
+        depthLabel.setText("Depth", dontSendNotification);
+        depthLabel.setJustificationType(Justification::centred);
+        addAndMakeVisible(&depthLabel);
+        depthLabel.attachToComponent(&depthSlider, false);
     }
 
-    ~OscGUI()
+    ~FmGUI()
     {
     }
 
@@ -82,19 +83,15 @@ public:
     {
         //g.fillAll (getLookAndFeel().findColour (ResizableWindow::backgroundColourId));   // clear the background
 
-        //g.setColour (Colours::white);
+        //g.setColour (Colours::grey);
         //g.drawRect (getLocalBounds(), 1);   // draw an outline around the component
-
-        //g.setColour (Colours::white);
-        //g.setFont (14.0f);
-        //g.drawText ("OSC", getLocalBounds(), Justification::centred, true);
     }
 
     void resized() override
     {
         const int padding = 10;
         Rectangle<int> area = getLocalBounds().reduced(padding);
-     
+
         int rotaryWidth = area.getWidth() / 3;
         int rotaryHeight = area.getHeight() / 3;
         int boxWidth = area.getWidth() / 3;
@@ -102,7 +99,7 @@ public:
 
         // top half
         area.removeFromTop(padding);
-        oscLabel.setBounds(area.removeFromLeft(boxWidth).removeFromTop(rotaryHeight));
+        fmLabel.setBounds(area.removeFromLeft(boxWidth).removeFromTop(rotaryHeight));
         Rectangle<int> boxArea = area.removeFromRight(boxWidth * 2).removeFromTop(rotaryHeight);
         oscType.setBounds(boxArea.getX(), boxArea.getY() + boxArea.getHeight() / 2 - boxHeight / 2,
             boxArea.getWidth(), boxHeight);
@@ -110,28 +107,29 @@ public:
         // bottom half
         area = getLocalBounds().reduced(padding);
         area.removeFromBottom(padding);
-        gainSlider.setBounds(area.removeFromLeft(rotaryWidth).removeFromBottom(rotaryHeight));
-        noiseSlider.setBounds(area.removeFromLeft(rotaryWidth).removeFromBottom(rotaryHeight));
+        multiSlider.setBounds(area.removeFromLeft(rotaryWidth).removeFromBottom(rotaryHeight));
         freqSlider.setBounds(area.removeFromLeft(rotaryWidth).removeFromBottom(rotaryHeight));
+        depthSlider.setBounds(area.removeFromBottom(rotaryHeight));
     }
 
 private:
     AudioProcessorValueTreeState& parameters;
 
     ComboBox oscType;
-    Slider gainSlider;
-    Slider noiseSlider;
+
+    Slider multiSlider;
+    Slider depthSlider;
     Slider freqSlider;
 
-    Label oscLabel;
-    Label gainLabel;
-    Label noiseLabel;
+    Label multiLabel;
+    Label depthLabel;
     Label freqLabel;
+    Label fmLabel;
 
-    std::unique_ptr<ComboBoxAttachment> oscTypeAttach;
-    std::unique_ptr<SliderAttachment> gainAttach;
-    std::unique_ptr<SliderAttachment> noiseAttach;
+    std::unique_ptr<SliderAttachment> multiAttach;
+    std::unique_ptr<SliderAttachment> depthAttach;
     std::unique_ptr<SliderAttachment> freqAttach;
+    std::unique_ptr<ComboBoxAttachment> oscTypeAttach;
 
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (OscGUI)
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (FmGUI)
 };

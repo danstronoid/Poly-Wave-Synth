@@ -15,7 +15,8 @@ WaveSynthEngine::WaveSynthEngine()
 	setNoteStealingEnabled(true);
 
 	for (int i = 0; i < m_maxVoices; ++i)
-		addVoice(new WaveTableVoice(m_tableGenerator.getTables(m_waveType)));
+		addVoice(new WaveTableVoice(m_tableGenerator.getTables(m_waveType), 
+			m_tableGenerator.getTables(m_fmWaveType)));
 
 	addSound(new WaveTableSound);
 }
@@ -29,16 +30,41 @@ void WaveSynthEngine::setOscType(WaveType type)
 
 		clearVoices();
 		for (int i = 0; i < m_maxVoices; ++i)
-			addVoice(new WaveTableVoice(m_tableGenerator.getTables(type)));
+			addVoice(new WaveTableVoice(m_tableGenerator.getTables(type), 
+				m_tableGenerator.getTables(m_fmWaveType)));
 	}
 }
 
-void WaveSynthEngine::setOscParameters(float noise)
+void WaveSynthEngine::setFMOscType(WaveType type)
+{
+	if (type != m_fmWaveType)
+	{
+		m_fmWaveType = type;
+		allNotesOff(0, false);
+
+		clearVoices();
+		for (int i = 0; i < m_maxVoices; ++i)
+			addVoice(new WaveTableVoice(m_tableGenerator.getTables(m_waveType), 
+				m_tableGenerator.getTables(type)));
+	}
+}
+
+void WaveSynthEngine::setOscParameters(float noise, float freq)
 {
 	for (int i = 0; i < getNumVoices(); ++i)
 	{
 		auto* voice = dynamic_cast<WaveTableVoice*>(getVoice(i));
 		voice->m_noise = noise;
+		voice->m_osc.setParameters(1, 0.3, freq);
+	}
+}
+
+void WaveSynthEngine::setModParameters(float multi, float depth, float freq)
+{
+	for (int i = 0; i < getNumVoices(); ++i)
+	{
+		auto* voice = dynamic_cast<WaveTableVoice*>(getVoice(i));
+		voice->m_fmOsc.setParameters(multi, depth, freq);
 	}
 }
 

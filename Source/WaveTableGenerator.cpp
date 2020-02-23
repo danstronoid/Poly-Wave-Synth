@@ -22,13 +22,13 @@ const std::vector<AudioSampleBuffer>& WaveTableGenerator::getTables(WaveType typ
 {
 	switch (type)
 	{
-	case SINE:
+	case WaveType::SINE:
 		return m_sineTable;
-	case SQUARE:
+	case WaveType::SQUARE:
 		return m_squareTable;
-	case SAW:
+	case WaveType::SAW:
 		return m_sawTable;
-	case TRI:
+	case WaveType::TRI:
 		return m_triTable;
 	default:
 		return m_sineTable;
@@ -39,13 +39,13 @@ const AudioSampleBuffer& WaveTableGenerator::getTable(WaveType type) const
 {
 	switch (type)
 	{
-	case SINE:
+	case WaveType::SINE:
 		return m_sineTable[0];
-	case SQUARE:
+	case WaveType::SQUARE:
 		return m_squareTable[0];
-	case SAW:
+	case WaveType::SAW:
 		return m_sawTable[0];
-	case TRI:
+	case WaveType::TRI:
 		return m_triTable[0];
 	default:
 		return m_sineTable[0];
