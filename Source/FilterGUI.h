@@ -30,31 +30,26 @@ public:
         cutoffSlider.setTextBoxStyle(Slider::NoTextBox, true, 0, 0);
         cutoffSlider.setPopupDisplayEnabled(true, false, this);
         addAndMakeVisible(&cutoffSlider);
-        cutoffAttach.reset(new SliderAttachment(parameters, "cutoff", cutoffSlider));
+        cutoffAttach.reset(new SliderAttachment(parameters, "filter_cutoff", cutoffSlider));
 
         qSlider.setSliderStyle(Slider::RotaryHorizontalVerticalDrag);
         qSlider.setTextBoxStyle(Slider::NoTextBox, true, 0, 0); 
         qSlider.setPopupDisplayEnabled(true, false, this);
         addAndMakeVisible(&qSlider);
-        qAttach.reset(new SliderAttachment(parameters, "q", qSlider));
+        qAttach.reset(new SliderAttachment(parameters, "filter_q", qSlider));
 
         envAmtSlider.setSliderStyle(Slider::RotaryHorizontalVerticalDrag);
         envAmtSlider.setTextBoxStyle(Slider::NoTextBox, true, 0, 0);
         envAmtSlider.setPopupDisplayEnabled(true, false, this);
         addAndMakeVisible(&envAmtSlider);
-        envAmtAttach.reset(new SliderAttachment(parameters, "envAmt", envAmtSlider));
+        envAmtAttach.reset(new SliderAttachment(parameters, "filter_envAmt", envAmtSlider));
 
-        /*modAmtSlider.setSliderStyle(Slider::RotaryHorizontalVerticalDrag);
-        modAmtSlider.setTextBoxStyle(Slider::NoTextBox, true, 0, 0);
-        modAmtSlider.setPopupDisplayEnabled(true, false, this);
-        addAndMakeVisible(&modAmtSlider);*/
-
-        filterType.addItem("LP", 1); 
-        filterType.addItem("HP", 2);
-        filterType.addItem("BP", 3);
+        filterType.addItem("Low Pass", 1); 
+        filterType.addItem("High Pass", 2);
+        filterType.addItem("Band Pass", 3);
         filterType.setJustificationType(Justification::centred);
         addAndMakeVisible(&filterType);
-        filterTypeAttach.reset(new ComboBoxAttachment(parameters, "filterType", filterType));
+        filterTypeAttach.reset(new ComboBoxAttachment(parameters, "filter_type", filterType));
 
         // Labels
         cutoffLabel.setText("Cutoff", dontSendNotification);
@@ -71,11 +66,6 @@ public:
         envAmtLabel.setJustificationType(Justification::centred);
         addAndMakeVisible(&envAmtLabel);
         envAmtLabel.attachToComponent(&envAmtSlider, false);
-
-        /*modAmtLabel.setText("Env", dontSendNotification);
-        modAmtLabel.setJustificationType(Justification::centred);
-        addAndMakeVisible(&modAmtLabel);
-        modAmtLabel.attachToComponent(&modAmtSlider, false);*/
 
         filterLabel.setText("Filter", dontSendNotification);
         filterLabel.setFont(Font(20.0f, Font::bold));
@@ -132,19 +122,16 @@ private:
     Slider cutoffSlider;
     Slider qSlider;
     Slider envAmtSlider;
-    //Slider modAmtSlider;
     ComboBox filterType;
 
     Label cutoffLabel;
     Label qLabel;
     Label envAmtLabel;
-    //Label modAmtLabel;
     Label filterLabel;
 
     std::unique_ptr<SliderAttachment> cutoffAttach;
     std::unique_ptr<SliderAttachment> qAttach;
     std::unique_ptr<SliderAttachment> envAmtAttach;
-    //std::unique_ptr<SliderAttachment> modAmtAttach;
     std::unique_ptr<ComboBoxAttachment> filterTypeAttach;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (FilterGUI)

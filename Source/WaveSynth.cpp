@@ -10,61 +10,85 @@
 
 #include "WaveSynth.h"
 
-WaveSynthEngine::WaveSynthEngine()
+WaveSynthEngine::WaveSynthEngine() :
+	m_lfo(m_tableGenerator)
 {
 	setNoteStealingEnabled(true);
 
 	for (int i = 0; i < m_maxVoices; ++i)
-		addVoice(new WaveTableVoice(m_tableGenerator.getTables(m_waveType), 
-			m_tableGenerator.getTables(m_fmWaveType)));
+		addVoice(new WaveTableVoice(m_tableGenerator, m_lfoBuffer));
 
 	addSound(new WaveTableSound);
 }
 
+void WaveSynthEngine::setCurrentPlaybackSampleRate(double sampleRate)
+{
+	m_lfo.setSampleRate(sampleRate);
+
+	Synthesiser::setCurrentPlaybackSampleRate(sampleRate);
+}
+
+void WaveSynthEngine::renderNextBlock(AudioBuffer<float>& output, const MidiBuffer& inputMidi, 
+	int startSample, int numSamples)
+{
+	renderLfoBuffer(startSample, numSamples);
+	Synthesiser::renderNextBlock(output, inputMidi, startSample, numSamples);
+}
+
+void WaveSynthEngine::renderLfoBuffer(int startSample, int numSamples)
+{
+	m_lfo.calculateDelta();
+
+	// maybe move this to a prepare function
+	m_lfoBuffer.setSize(1, numSamples);
+
+	m_lfoBuffer.clear();
+
+	while (--numSamples >= 0)
+	{
+		float currentSample = m_lfo.getNextSample();
+		m_lfoBuffer.addSample(0, startSample, currentSample);
+		++startSample;
+	}
+}
+
+//==============================================================================
+// Set functions
+
 void WaveSynthEngine::setOscType(WaveType type)
 {
-	if (type != m_waveType)
+	for (int i = 0; i < getNumVoices(); ++i)
 	{
-		m_waveType = type;
-		allNotesOff(0, false);
-
-		clearVoices();
-		for (int i = 0; i < m_maxVoices; ++i)
-			addVoice(new WaveTableVoice(m_tableGenerator.getTables(type), 
-				m_tableGenerator.getTables(m_fmWaveType)));
+		auto* voice = dynamic_cast<WaveTableVoice*>(getVoice(i));
+		voice->m_osc.setOscType(type);
 	}
 }
 
 void WaveSynthEngine::setFMOscType(WaveType type)
 {
-	if (type != m_fmWaveType)
+	for (int i = 0; i < getNumVoices(); ++i)
 	{
-		m_fmWaveType = type;
-		allNotesOff(0, false);
-
-		clearVoices();
-		for (int i = 0; i < m_maxVoices; ++i)
-			addVoice(new WaveTableVoice(m_tableGenerator.getTables(m_waveType), 
-				m_tableGenerator.getTables(type)));
+		auto* voice = dynamic_cast<WaveTableVoice*>(getVoice(i));
+		voice->m_fmOsc.setOscType(type);
 	}
 }
 
-void WaveSynthEngine::setOscParameters(float noise, float freq)
+void WaveSynthEngine::setOscParameters(float level, float noise, float freq, bool fixed)
 {
 	for (int i = 0; i < getNumVoices(); ++i)
 	{
 		auto* voice = dynamic_cast<WaveTableVoice*>(getVoice(i));
 		voice->m_noise = noise;
-		voice->m_osc.setParameters(1, 0.3, freq);
+		voice->m_osc.setParameters(freq, level, 1, fixed);
 	}
 }
 
-void WaveSynthEngine::setModParameters(float multi, float depth, float freq)
+void WaveSynthEngine::setFMParameters(float freq, float depth, float multi, bool fixed)
 {
 	for (int i = 0; i < getNumVoices(); ++i)
 	{
 		auto* voice = dynamic_cast<WaveTableVoice*>(getVoice(i));
-		voice->m_fmOsc.setParameters(multi, depth, freq);
+		voice->m_fmOsc.setParameters(freq, depth, multi, fixed);
 	}
 }
 
@@ -94,6 +118,16 @@ void WaveSynthEngine::setFilterADSR(float attack, float decay, float sustain, fl
 		auto* voice = dynamic_cast<WaveTableVoice*>(getVoice(i));
 		voice->m_filterADSR.setParameters(attack, decay, sustain, release);
 	}
+}
+
+void WaveSynthEngine::setFilterLFOType(WaveType type)
+{
+	m_lfo.setOscType(type);
+}
+
+void WaveSynthEngine::setFilterLFO(float rate, float depth)
+{
+	m_lfo.setParameters(rate, depth, 1, true, true);
 }
 
 //==============================================================================

@@ -38,7 +38,7 @@ public:
 
     void update(double env = 1, double mod = 0)
     {
-        m_cutoff = fmax(40, m_targetCutoff * env + mod);
+        m_cutoff = fmin(19000, fmax(40, m_targetCutoff * env + mod * m_targetCutoff / 2));
         calculateCoef();
     }
 

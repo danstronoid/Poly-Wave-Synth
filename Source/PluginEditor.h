@@ -17,6 +17,7 @@
 #include "FilterGUI.h"
 #include "FilterEnvGUI.h"
 #include "FmGUI.h"
+#include "LfoGUI.h"
 
 typedef AudioProcessorValueTreeState::SliderAttachment SliderAttachment;
 
@@ -44,6 +45,7 @@ private:
     FilterGUI filterGUI;
     FilterEnvGUI filterEnvGUI;
     FmGUI fmGUI;
+    LfoGUI lfoGUI;
 
     const int componentWidth = 200;
     const int componentHeight = 200;

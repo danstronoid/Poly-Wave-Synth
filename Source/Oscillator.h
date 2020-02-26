@@ -11,32 +11,42 @@
 #pragma once
 
 #include "../JuceLibraryCode/JuceHeader.h"
+#include "WaveTableGenerator.h"
 
 // this can be used with noteOn() for midi input, 
 // or as a static oscillator with setParameters() 
 class Oscillator
 {
 public:
-    Oscillator(const std::vector<AudioSampleBuffer>& tables) :
-        m_tables(tables)
+    Oscillator(const WaveTableGenerator& tableGenerator) :
+        m_tables(tableGenerator)
     {
-        m_tableSize = m_tables[m_octave].getNumSamples() - 1;
+        m_tableSize = m_tables.getTableSize();
     }
 
-    void setSampleRate(int sampleRate)
+    void setSampleRate(double sampleRate)
     {
         m_sampleRate = sampleRate;
         m_sizeOverSR = static_cast<float>(m_tableSize) / m_sampleRate;
     }
 
-    void setParameters(float multi = 1, float depth = 0.3, float fixedFreq = 0)
+    void setOscType(WaveType type)
+    {
+        m_waveType = type;
+    }
+
+    void setParameters(float freq, float oscLevel = 0.3, float multi = 1, bool fixedFreq = false, bool initLvl = false)
     {
         m_multi = multi;
-        m_oscLevel = depth;
+        m_oscLevel = oscLevel;
         m_fixedFreq = fixedFreq;
 
-        if (m_fixedFreq > 40)
-            m_freq = m_fixedFreq;
+        if (m_fixedFreq)
+            m_freq = freq;
+
+        // this bool only needs to be used if the level must be initialized
+        if (initLvl)
+            m_level = m_oscLevel;    
     }
 
     void calculateDelta(float mod = 0)
@@ -53,9 +63,7 @@ public:
         // need to alter this so that the octave is calculated from the frequency 
         m_octave = midiNoteNumber / 12 - 1;
 
-        if (m_fixedFreq > 40)
-            m_freq = m_fixedFreq;
-        else
+        if (!m_fixedFreq)
             m_freq = MidiMessage::getMidiNoteInHertz(midiNoteNumber);
 
         m_tableDelta = (m_freq * m_multi) * m_sizeOverSR;
@@ -68,7 +76,7 @@ public:
 
         float frac = m_tablePos - static_cast<float>(index0);
 
-        const float* table = m_tables[m_octave].getReadPointer(0);
+        const float* table = m_tables.getTables(m_waveType)[m_octave].getReadPointer(0);
         float value0 = table[index0];
         float value1 = table[index1];
 
@@ -98,19 +106,28 @@ public:
     }
 
 private:
-    const std::vector<AudioSampleBuffer>& m_tables;
+    // each oscillator has a reference to all of the tables in the table generator
+    // for ease of switching osc types
+    const WaveTableGenerator& m_tables;
+    WaveType m_waveType{ WaveType::SINE };
     int m_octave{};
 
-    int m_sampleRate{};
-    float m_level{};
-    float m_oscLevel{ 0.3f };
-
-    float m_multi{ 1.0f };
-    float m_freq{};
-    float m_fixedFreq{};
-
-    int m_tableSize{};
+    // all parameters needed to calculate delta
+    double m_sampleRate{};
     float m_sizeOverSR{};
+    int m_tableSize{};
     float m_tablePos{};
     float m_tableDelta{};
+
+    // the max level for the osc, 0.3f is a modest level
+    float m_oscLevel{ 0.3f };
+    // the output level (m_oscLevel * velocity)
+    float m_level{};
+
+    // the frequency of the osc
+    float m_freq{};
+    // this tests whether the osc uses a fixed frequency or response to note on
+    bool m_fixedFreq{};
+    // this is a frequency multiplier for FM 
+    float m_multi{ 1.0f };
 };

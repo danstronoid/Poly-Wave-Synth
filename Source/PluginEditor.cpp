@@ -14,7 +14,7 @@
 //==============================================================================
 PolyWaveSynthAudioProcessorEditor::PolyWaveSynthAudioProcessorEditor (PolyWaveSynthAudioProcessor& p, AudioProcessorValueTreeState& vts)
     : AudioProcessorEditor (&p), processor (p), parameters (vts), 
-    ampEnvGUI(vts), oscGUI(vts), filterGUI(vts), filterEnvGUI(vts), fmGUI(vts)
+    ampEnvGUI(vts), oscGUI(vts), filterGUI(vts), filterEnvGUI(vts), fmGUI(vts), lfoGUI(vts)
 {
     setSize (componentWidth * 3 + padding * 2, componentHeight * 2 + padding * 4);
 
@@ -23,6 +23,7 @@ PolyWaveSynthAudioProcessorEditor::PolyWaveSynthAudioProcessorEditor (PolyWaveSy
     addAndMakeVisible(&filterGUI);
     addAndMakeVisible(&filterEnvGUI);
     addAndMakeVisible(&fmGUI);
+    addAndMakeVisible(&lfoGUI);
 }
 
 PolyWaveSynthAudioProcessorEditor::~PolyWaveSynthAudioProcessorEditor()
@@ -58,5 +59,5 @@ void PolyWaveSynthAudioProcessorEditor::resized()
     area.removeFromTop(componentHeight + padding);
     filterGUI.setBounds(area.removeFromLeft(componentWidth).removeFromTop(componentHeight));
     filterEnvGUI.setBounds(area.removeFromLeft(componentWidth).removeFromTop(componentHeight));
-    
+    lfoGUI.setBounds(area.removeFromLeft(componentWidth).removeFromTop(componentHeight));
 }

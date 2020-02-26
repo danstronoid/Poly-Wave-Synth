@@ -26,7 +26,6 @@ public:
     ~PolyWaveSynthAudioProcessor();
 
     //==============================================================================
-	void parameterChanged(const String& parameterID, float newValue);
 
     void prepareToPlay (double sampleRate, int samplesPerBlock) override;
     void releaseResources() override;
@@ -60,6 +59,27 @@ public:
     void getStateInformation (MemoryBlock& destData) override;
     void setStateInformation (const void* data, int sizeInBytes) override;
 
+    //==============================================================================
+    /* These are helper functions to update parameters */
+
+    // create the parameter layout for the constructor
+    AudioProcessorValueTreeState::ParameterLayout createParameterLayout();
+
+    // add all parameter listeners
+    void addParameterListeners();
+
+    // executes callback when a parameter is changed
+    void parameterChanged(const String& parameterID, float newValue);
+
+    // callback functions to update the different components
+    void updateOsc();
+    void updateFM();
+    void updateAmpEnv();
+    void updateFilter();
+    void updateFilterEnv();
+    void updateFilterLFO();
+
+    // initialze all parameters
     void initParameters();
 
 private:

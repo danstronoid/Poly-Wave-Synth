@@ -29,25 +29,25 @@ public:
         attackSlider.setTextBoxStyle(Slider::NoTextBox, true, 0, 0);
         attackSlider.setPopupDisplayEnabled(true, false, this);
         addAndMakeVisible(&attackSlider);
-        attackAttach.reset(new SliderAttachment(parameters, "amp_attack", attackSlider));
+        attackAttach.reset(new SliderAttachment(parameters, "ampEnv_attack", attackSlider));
 
         decaySlider.setSliderStyle(Slider::LinearVertical);
         decaySlider.setTextBoxStyle(Slider::NoTextBox, true, 0, 0);
         decaySlider.setPopupDisplayEnabled(true, false, this);
         addAndMakeVisible(&decaySlider);
-        decayAttach.reset(new SliderAttachment(parameters, "amp_decay", decaySlider));
+        decayAttach.reset(new SliderAttachment(parameters, "ampEnv_decay", decaySlider));
 
         sustainSlider.setSliderStyle(Slider::LinearVertical);
         sustainSlider.setTextBoxStyle(Slider::NoTextBox, true, 0, 0);
         sustainSlider.setPopupDisplayEnabled(true, false, this);
         addAndMakeVisible(&sustainSlider);
-        sustainAttach.reset(new SliderAttachment(parameters, "amp_sustain", sustainSlider));
+        sustainAttach.reset(new SliderAttachment(parameters, "ampEnv_sustain", sustainSlider));
 
         releaseSlider.setSliderStyle(Slider::LinearVertical);
         releaseSlider.setTextBoxStyle(Slider::NoTextBox, true, 0, 0);
         releaseSlider.setPopupDisplayEnabled(true, false, this);
         addAndMakeVisible(&releaseSlider);
-        releaseAttach.reset(new SliderAttachment(parameters, "amp_release", releaseSlider));
+        releaseAttach.reset(new SliderAttachment(parameters, "ampEnv_release", releaseSlider));
 
         // Labels
         attackLabel.setText("A", dontSendNotification);

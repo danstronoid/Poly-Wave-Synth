@@ -11,39 +11,8 @@
 #include "PluginProcessor.h"
 #include "PluginEditor.h"
 
-NormalisableRange<float> frequencyRange(float min, float max, float interval)
-{
-    return { min, max, interval, 1.0f / std::log2(1.0f + std::sqrt(max / min)) };
-}
-
 //==============================================================================
 PolyWaveSynthAudioProcessor::PolyWaveSynthAudioProcessor() :
-    parameters(*this, nullptr, "PolyWaveSynth",
-        {
-            // osciallator parameters
-            std::make_unique<AudioParameterInt>("oscType", "OscType", 0, 3, 0),
-            std::make_unique<AudioParameterFloat>("gain", "Gain", 0.0f, 1.0f, 0.6f),
-            std::make_unique<AudioParameterFloat>("noise", "Noise", 0.0f, 0.3f, 0.0f),
-            std::make_unique<AudioParameterFloat>("osc_freq", "OscFreq", frequencyRange(40.0f, 12000.0f, 0.01), 40.0f),
-            std::make_unique<AudioParameterFloat>("amp_attack", "Attack", 0.001f, 2.0f, 0.01f),
-            std::make_unique<AudioParameterFloat>("amp_decay", "Decay", 0.001f, 2.0f, 0.01f),
-            std::make_unique<AudioParameterFloat>("amp_sustain", "Sustain", 0.0f, 1.0f, 1.0f),
-            std::make_unique<AudioParameterFloat>("amp_release", "Release", 0.01f, 2.0f, 0.05f),
-            std::make_unique<AudioParameterInt>("fm_oscType", "FMOscType", 0, 3, 0),
-            std::make_unique<AudioParameterFloat>("fm_multi", "Multi", 0.0f, 4.0f, 1.0f),
-            std::make_unique<AudioParameterFloat>("fm_freq", "FMFreq", frequencyRange(40.0f, 12000.0f, 0.01), 40.0f),
-            std::make_unique<AudioParameterFloat>("fm_depth", "Depth", 0.0f, 1.0f, 0.0f),
-
-            // filter parameters
-            std::make_unique<AudioParameterInt>("filterType", "FilterType", 0, 2, 0),
-            std::make_unique<AudioParameterFloat>("cutoff", "Cufoff", frequencyRange(40.0f, 19000.0f, 0.01), 1000.0f),
-            std::make_unique<AudioParameterFloat>("q", "Q", 0.01f, 5.0f, 1.0f),
-            std::make_unique<AudioParameterFloat>("envAmt", "Env", 0.0f, 1.0f, 1.0f),
-            std::make_unique<AudioParameterFloat>("filter_attack", "Attack", 0.001f, 2.0f, 0.01f),
-            std::make_unique<AudioParameterFloat>("filter_decay", "Decay", 0.001f, 2.0f, 0.01f),
-            std::make_unique<AudioParameterFloat>("filter_sustain", "Sustain", 0.0f, 1.0f, 1.0f),
-            std::make_unique<AudioParameterFloat>("filter_release", "Release", 0.01f, 2.0f, 0.05f),
-		}),
 #ifndef JucePlugin_PreferredChannelConfigurations
 	AudioProcessor(BusesProperties()
 #if ! JucePlugin_IsMidiEffect
@@ -52,133 +21,16 @@ PolyWaveSynthAudioProcessor::PolyWaveSynthAudioProcessor() :
 #endif
 		.withOutput("Output", AudioChannelSet::stereo(), true)
 #endif
-	)
+	),
+    parameters(*this, nullptr, "PolyWaveSynth", createParameterLayout())
 #endif
 {
-    // Osc parameter listeners
-    parameters.addParameterListener("oscType", this);
-	parameters.addParameterListener("gain", this);
-    parameters.addParameterListener("noise", this);
-    parameters.addParameterListener("osc_freq", this);
-	parameters.addParameterListener("amp_attack", this);
-	parameters.addParameterListener("amp_decay", this);
-	parameters.addParameterListener("amp_sustain", this);
-	parameters.addParameterListener("amp_release", this);
-    parameters.addParameterListener("fm_oscType", this);
-    parameters.addParameterListener("fm_multi", this);
-    parameters.addParameterListener("fm_freq", this);
-    parameters.addParameterListener("fm_depth", this);
-
-    // Filter parameter listeners
-    parameters.addParameterListener("filterType", this);
-    parameters.addParameterListener("cutoff", this);
-    parameters.addParameterListener("q", this);
-    parameters.addParameterListener("envAmt", this);
-    parameters.addParameterListener("filter_attack", this);
-    parameters.addParameterListener("filter_decay", this);
-    parameters.addParameterListener("filter_sustain", this);
-    parameters.addParameterListener("filter_release", this);
-
+    addParameterListeners();
     initParameters();
 }
 
 PolyWaveSynthAudioProcessor::~PolyWaveSynthAudioProcessor()
 {
-}
-
-void PolyWaveSynthAudioProcessor::initParameters()
-{
-    // this is a cheeky way of initializing values, probably a better way
-    auto* noise = parameters.getRawParameterValue("noise");
-    auto* osc_freq = parameters.getRawParameterValue("osc_freq");
-    synthEngine.setOscParameters(*noise, *osc_freq);
-
-    auto* fm_multi = parameters.getRawParameterValue("fm_multi");
-    auto* fm_freq = parameters.getRawParameterValue("fm_freq");
-    auto* fm_depth = parameters.getRawParameterValue("fm_depth");
-    synthEngine.setModParameters(*fm_multi, *fm_depth, *fm_freq);
-
-    auto* amp_attack = parameters.getRawParameterValue("amp_attack");
-    auto* amp_decay = parameters.getRawParameterValue("amp_decay");
-    auto* amp_sustain = parameters.getRawParameterValue("amp_sustain");
-    auto* amp_release = parameters.getRawParameterValue("amp_release");
-    synthEngine.setAmpADSR(*amp_attack, *amp_decay, *amp_sustain, *amp_release);
-
-    auto* filterType = parameters.getRawParameterValue("filterType");
-    auto* cutoff = parameters.getRawParameterValue("cutoff");
-    auto* q = parameters.getRawParameterValue("q");
-    auto* envAmt = parameters.getRawParameterValue("envAmt");
-    synthEngine.setFilterParameters(static_cast<State>((int)*filterType), *cutoff, *q, *envAmt);
-
-    auto* filter_attack = parameters.getRawParameterValue("filter_attack");
-    auto* filter_decay = parameters.getRawParameterValue("filter_decay");
-    auto* filter_sustain = parameters.getRawParameterValue("filter_sustain");
-    auto* filter_release = parameters.getRawParameterValue("filter_release");
-    synthEngine.setFilterADSR(*filter_attack, *filter_decay, *filter_sustain, *filter_release);
-}
-
-// callback for when a parameter is changed
-void PolyWaveSynthAudioProcessor::parameterChanged(const String& parameterID, float newValue)
-{
-    // osc
-    if (parameterID == "oscType")
-    {
-    int index = newValue;
-    synthEngine.setOscType(static_cast<WaveType>(index));
-
-    initParameters();
-    }
-    else if (parameterID == "fm_oscType")
-    {
-        int index = newValue;
-        synthEngine.setFMOscType(static_cast<WaveType>(index));
-
-        initParameters();
-    }
-    else if (parameterID == "fm_multi" || parameterID == "fm_depth" || parameterID == "fm_freq")
-    {
-        auto* fm_multi = parameters.getRawParameterValue("fm_multi");
-        auto* fm_freq = parameters.getRawParameterValue("fm_freq");
-        auto* fm_depth = parameters.getRawParameterValue("fm_depth");
-        synthEngine.setModParameters(*fm_multi, *fm_depth, *fm_freq);
-    }
-    else if (parameterID == "amp_attack" || parameterID == "amp_decay"
-        || parameterID == "amp_sustain" || parameterID == "amp_release")
-    {
-        auto* amp_attack = parameters.getRawParameterValue("amp_attack");
-        auto* amp_decay = parameters.getRawParameterValue("amp_decay");
-        auto* amp_sustain = parameters.getRawParameterValue("amp_sustain");
-        auto* amp_release = parameters.getRawParameterValue("amp_release");
-        synthEngine.setAmpADSR(*amp_attack, *amp_decay, *amp_sustain, *amp_release);
-    }
-    else if (parameterID == "gain")
-        currentGain = newValue;
-    else if (parameterID == "noise" || parameterID == "osc_freq")
-    {
-        auto* noise = parameters.getRawParameterValue("noise");
-        auto* osc_freq = parameters.getRawParameterValue("osc_freq");
-        synthEngine.setOscParameters(*noise, *osc_freq);
-    }
-
-    // filter
-    else if (parameterID == "filterType" || parameterID == "cutoff"
-        || parameterID == "q" || parameterID == "envAmt")
-    {
-        auto* filterType = parameters.getRawParameterValue("filterType");
-        auto* cutoff = parameters.getRawParameterValue("cutoff");
-        auto* q = parameters.getRawParameterValue("q");
-        auto* envAmt = parameters.getRawParameterValue("envAmt");
-        synthEngine.setFilterParameters(static_cast<State>((int)*filterType), *cutoff, *q, *envAmt);
-    }
-    else if (parameterID == "filter_attack" || parameterID == "filter_decay"
-        || parameterID == "filter_sustain" || parameterID == "filter_release")
-    {
-        auto* filter_attack = parameters.getRawParameterValue("filter_attack");
-        auto* filter_decay = parameters.getRawParameterValue("filter_decay");
-        auto* filter_sustain = parameters.getRawParameterValue("filter_sustain");
-        auto* filter_release = parameters.getRawParameterValue("filter_release");
-        synthEngine.setFilterADSR(*filter_attack, *filter_decay, *filter_sustain, *filter_release);
-    }
 }
 
 //==============================================================================
@@ -328,6 +180,204 @@ void PolyWaveSynthAudioProcessor::setStateInformation (const void* data, int siz
     if (xmlState.get() != nullptr)
         if (xmlState->hasTagName(parameters.state.getType()))
             parameters.replaceState(ValueTree::fromXml(*xmlState));
+}
+
+//==============================================================================
+
+// this is a helper function to create a range with a skew for frequency
+NormalisableRange<float> frequencyRange(float min, float max, float interval)
+{
+    return { min, max, interval, 1.0f / std::log2(1.0f + std::sqrt(max / min)) };
+}
+
+// create the parameters for the constructor
+AudioProcessorValueTreeState::ParameterLayout PolyWaveSynthAudioProcessor::createParameterLayout()
+{
+    std::vector< std::unique_ptr<RangedAudioParameter> > params;
+
+    // master parameters
+    params.push_back(std::make_unique<AudioParameterFloat>("gain", "Gain", 0.0f, 1.0f, 0.6f));
+
+    // osciallator parameters
+    params.push_back(std::make_unique<AudioParameterInt>("osc_oscType", "OscType", 0, 3, 0));
+    params.push_back(std::make_unique<AudioParameterFloat>("osc_level", "OscLevel", 0.0f, 0.6f, 0.3f));
+    params.push_back(std::make_unique<AudioParameterFloat>("osc_noise", "Noise", 0.0f, 0.3f, 0.0f));
+    params.push_back(std::make_unique<AudioParameterFloat>("osc_freq", "OscFreq", 
+        frequencyRange(20.0f, 12000.0f, 0.01), 20.0f));
+    params.push_back(std::make_unique<AudioParameterFloat>("ampEnv_attack", "Attack", 0.001f, 2.0f, 0.001f));
+    params.push_back(std::make_unique<AudioParameterFloat>("ampEnv_decay", "Decay", 0.001f, 2.0f, 0.01f));
+    params.push_back(std::make_unique<AudioParameterFloat>("ampEnv_sustain", "Sustain", 0.0f, 1.0f, 1.0f));
+    params.push_back(std::make_unique<AudioParameterFloat>("ampEnv_release", "Release", 0.01f, 2.0f, 0.05f));
+    params.push_back(std::make_unique<AudioParameterInt>("fm_oscType", "FMOscType", 0, 3, 0));
+    params.push_back(std::make_unique<AudioParameterFloat>("fm_multi", "Multi", 0.0f, 4.0f, 1.0f));
+    params.push_back(std::make_unique<AudioParameterFloat>("fm_freq", "FMFreq", 
+        frequencyRange(20.0f, 12000.0f, 0.01), 20.0f));
+    params.push_back(std::make_unique<AudioParameterFloat>("fm_depth", "Depth", 0.0f, 1.0f, 0.0f));
+
+    // filter parameters
+    params.push_back(std::make_unique<AudioParameterInt>("filter_type", "FilterType", 0, 2, 0));
+    params.push_back(std::make_unique<AudioParameterFloat>("filter_cutoff", "Cufoff", 
+        frequencyRange(40.0f, 19000.0f, 0.01), 19000.0f));
+    params.push_back(std::make_unique<AudioParameterFloat>("filter_q", "Q", 0.1f, 5.0f, 1.0f));
+    params.push_back(std::make_unique<AudioParameterFloat>("filter_envAmt", "Env", 0.0f, 1.0f, 0.0f));
+    params.push_back(std::make_unique<AudioParameterFloat>("filterEnv_attack", "Attack", 0.001f, 2.0f, 0.01f));
+    params.push_back(std::make_unique<AudioParameterFloat>("filterEnv_decay", "Decay", 0.001f, 2.0f, 0.01f));
+    params.push_back(std::make_unique<AudioParameterFloat>("filterEnv_sustain", "Sustain", 0.0f, 1.0f, 1.0f));
+    params.push_back(std::make_unique<AudioParameterFloat>("filterEnv_release", "Release", 0.01f, 2.0f, 0.05f));
+    params.push_back(std::make_unique<AudioParameterInt>("lfo_type", "LFOType", 0, 3, 0));
+    params.push_back(std::make_unique<AudioParameterFloat>("lfo_rate", "LFORate", 0.01f, 20.0f, 2.0f));
+    params.push_back(std::make_unique<AudioParameterFloat>("lfo_depth", "LFODepth", 0.0f, 1.0f, 0.0f));
+
+    return { params.begin(), params.end() };
+}
+
+// helper function to add parameter listeners in one place
+void PolyWaveSynthAudioProcessor::addParameterListeners()
+{
+    // master parameter listeners
+    parameters.addParameterListener("gain", this);
+
+    // Osc parameter listeners
+    parameters.addParameterListener("osc_oscType", this);
+    parameters.addParameterListener("osc_level", this);
+    parameters.addParameterListener("osc_noise", this);
+    parameters.addParameterListener("osc_freq", this);
+    parameters.addParameterListener("ampEnv_attack", this);
+    parameters.addParameterListener("ampEnv_decay", this);
+    parameters.addParameterListener("ampEnv_sustain", this);
+    parameters.addParameterListener("ampEnv_release", this);
+    parameters.addParameterListener("fm_oscType", this);
+    parameters.addParameterListener("fm_multi", this);
+    parameters.addParameterListener("fm_freq", this);
+    parameters.addParameterListener("fm_depth", this);
+
+    // Filter parameter listeners
+    parameters.addParameterListener("filter_type", this);
+    parameters.addParameterListener("filter_cutoff", this);
+    parameters.addParameterListener("filter_q", this);
+    parameters.addParameterListener("filter_envAmt", this);
+    parameters.addParameterListener("filterEnv_attack", this);
+    parameters.addParameterListener("filterEnv_decay", this);
+    parameters.addParameterListener("filterEnv_sustain", this);
+    parameters.addParameterListener("filterEnv_release", this);
+    parameters.addParameterListener("lfo_type", this);
+    parameters.addParameterListener("lfo_rate", this);
+    parameters.addParameterListener("lfo_depth", this);
+}
+
+// initialize all parameters
+void PolyWaveSynthAudioProcessor::initParameters()
+{
+    // this is a cheeky way of initializing values, probably a better way
+    updateOsc();
+    updateFM();
+    updateAmpEnv();
+    updateFilter();
+    updateFilterEnv();
+    updateFilterLFO();
+}
+
+// callback for when a parameter is changed
+void PolyWaveSynthAudioProcessor::parameterChanged(const String& parameterID, float newValue)
+{
+    // master
+    if (parameterID == "gain")
+        currentGain = newValue;
+
+    // osc
+    else if (parameterID.containsWholeWord("osc"))
+    {
+        updateOsc();
+    }
+    else if (parameterID.containsWholeWord("fm"))
+    {
+        updateFM();
+    }
+    else if (parameterID.containsWholeWord("ampEnv"))
+    {
+        updateAmpEnv();
+    }
+
+    // filter
+    else if (parameterID.containsWholeWord("filter"))
+    {
+        updateFilter();
+    }
+    else if (parameterID.containsWholeWord("filterEnv"))
+    {
+        updateFilterEnv();
+    }
+    else if (parameterID.containsWholeWord("lfo"))
+    {
+        updateFilterLFO();
+    }
+}
+
+void PolyWaveSynthAudioProcessor::updateOsc()
+{
+    auto* osc_oscType = parameters.getRawParameterValue("osc_oscType");
+    synthEngine.setOscType(static_cast<WaveType>((int)*osc_oscType));
+
+    auto* osc_level = parameters.getRawParameterValue("osc_level");
+    auto* osc_noise = parameters.getRawParameterValue("osc_noise");
+    auto* osc_freq = parameters.getRawParameterValue("osc_freq");
+
+    // this creates a boolean to test if the osc freq is fixed 
+    // or if it should respond to note on
+    auto oscRange = parameters.getParameterRange("osc_freq");
+    bool oscFixed = oscRange.convertTo0to1(*osc_freq);
+
+    synthEngine.setOscParameters(*osc_level, *osc_noise, *osc_freq, oscFixed);
+}
+
+void PolyWaveSynthAudioProcessor::updateFM() 
+{
+    auto* fm_oscType = parameters.getRawParameterValue("fm_oscType");
+    synthEngine.setFMOscType(static_cast<WaveType>((int)*fm_oscType));
+
+    auto* fm_multi = parameters.getRawParameterValue("fm_multi");
+    auto* fm_freq = parameters.getRawParameterValue("fm_freq");
+    auto* fm_depth = parameters.getRawParameterValue("fm_depth");
+
+    // this creates a boolean to test if the osc freq is fixed 
+    // or if it should respond to note on
+    auto fmRange = parameters.getParameterRange("fm_freq");
+    bool fmFixed = fmRange.convertTo0to1(*fm_freq);
+
+    synthEngine.setFMParameters(*fm_freq, *fm_depth, *fm_multi, fmFixed);
+}
+void PolyWaveSynthAudioProcessor::updateAmpEnv() 
+{
+    auto* ampEnv_attack = parameters.getRawParameterValue("ampEnv_attack");
+    auto* ampEnv_decay = parameters.getRawParameterValue("ampEnv_decay");
+    auto* ampEnv_sustain = parameters.getRawParameterValue("ampEnv_sustain");
+    auto* ampEnv_release = parameters.getRawParameterValue("ampEnv_release");
+    synthEngine.setAmpADSR(*ampEnv_attack, *ampEnv_decay, *ampEnv_sustain, *ampEnv_release);
+}
+void PolyWaveSynthAudioProcessor::updateFilter() 
+{
+    auto* filter_type = parameters.getRawParameterValue("filter_type");
+    auto* filter_cutoff = parameters.getRawParameterValue("filter_cutoff");
+    auto* filter_q = parameters.getRawParameterValue("filter_q");
+    auto* filter_envAmt = parameters.getRawParameterValue("filter_envAmt");
+    synthEngine.setFilterParameters(static_cast<State>((int)*filter_type), *filter_cutoff, *filter_q, *filter_envAmt);
+}
+void PolyWaveSynthAudioProcessor::updateFilterEnv() 
+{
+    auto* filterEnv_attack = parameters.getRawParameterValue("filterEnv_attack");
+    auto* filterEnv_decay = parameters.getRawParameterValue("filterEnv_decay");
+    auto* filterEnv_sustain = parameters.getRawParameterValue("filterEnv_sustain");
+    auto* filterEnv_release = parameters.getRawParameterValue("filterEnv_release");
+    synthEngine.setFilterADSR(*filterEnv_attack, *filterEnv_decay, *filterEnv_sustain, *filterEnv_release);
+}
+void PolyWaveSynthAudioProcessor::updateFilterLFO() 
+{
+    auto* lfo_type = parameters.getRawParameterValue("lfo_type");
+    synthEngine.setFilterLFOType(static_cast<WaveType>((int)*lfo_type));
+
+    auto* lfo_rate = parameters.getRawParameterValue("lfo_rate");
+    auto* lfo_depth = parameters.getRawParameterValue("lfo_depth");
+    synthEngine.setFilterLFO(*lfo_rate, *lfo_depth);
 }
 
 //==============================================================================

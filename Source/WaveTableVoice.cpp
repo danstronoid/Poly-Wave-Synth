@@ -10,16 +10,14 @@
 
 #include "WaveTableVoice.h"
 
-WaveTableVoice::WaveTableVoice(const std::vector<AudioSampleBuffer>& oscTables, const std::vector<AudioSampleBuffer>& modTables) :
-	m_osc(oscTables), m_fmOsc(modTables)
+WaveTableVoice::WaveTableVoice(const WaveTableGenerator& tableGenerator,
+	AudioBuffer<float>& controlBuffer) :
+	m_osc(tableGenerator), m_fmOsc(tableGenerator), m_lfoBuffer(controlBuffer)
 {
+	// initialize the sampleRate for all of the components
 	m_osc.setSampleRate(getSampleRate());
 	m_fmOsc.setSampleRate(getSampleRate());
-	m_fmOsc.setParameters(0, 1);
-
 	m_svf.setSampleRate(getSampleRate());
-	m_svf.setParameters(State::Low_Pass, 400, 1);
-
 	m_ampADSR.setSampleRate(getSampleRate());
 	m_filterADSR.setSampleRate(getSampleRate());
 }
@@ -66,9 +64,12 @@ void WaveTableVoice::renderNextBlock(AudioBuffer<float>& outputBuffer, int start
 {
 	if (m_osc.isActive())
 	{
+		// get a read pointer from the control buffer
+		auto* lfoValues = m_lfoBuffer.getReadPointer(0);
 
 		while (--numSamples >= 0)
 		{
+			// if the ampEnv is not active, we can clear the note and reset
 			if (!m_ampADSR.isActive())
 			{
 				m_ampADSR.reset();
@@ -76,20 +77,24 @@ void WaveTableVoice::renderNextBlock(AudioBuffer<float>& outputBuffer, int start
 				clearCurrentNote();
 				m_osc.reset();
 			}
+			// calculate and apply FM to the osc delta
 			float fmValue = m_fmOsc.getNextSample();
-
 			m_osc.calculateDelta(fmValue);
 
+			// get the current sample from the osc and get a noise value
 			float currentSample = m_osc.getNextSample();
-
-			float ampEnvValue = m_ampADSR.getNextSample();
-			float filterEnvValue = m_filterADSR.getNextSample() * m_envAmt + (1 - m_envAmt);
-
 			float noise = random.nextFloat() * m_noise - (m_noise / 2);
 
-			m_svf.update(filterEnvValue);
+			// get the envelope and control values
+			float ampEnvValue = m_ampADSR.getNextSample();
+			float filterEnvValue = m_filterADSR.getNextSample() * m_envAmt + (1 - m_envAmt);
+			float lfoValue = lfoValues[startSample];
+
+			// update the filter with the envelope and modulation and apply it to the sample
+			m_svf.update(filterEnvValue, lfoValue);
 			currentSample = m_svf.renderSample(currentSample + noise);
 
+			// apply the ampEnv to the sample and add it to the output buffer
 			for (auto channel = outputBuffer.getNumChannels(); --channel >= 0;)
 				outputBuffer.addSample(channel, startSample, currentSample * ampEnvValue);
 
@@ -100,6 +105,7 @@ void WaveTableVoice::renderNextBlock(AudioBuffer<float>& outputBuffer, int start
 
 void WaveTableVoice::pitchWheelMoved(int /*newPitchWheelValue*/) {}
 void WaveTableVoice::controllerMoved(int /*controllerNumber*/, int /*newControllerValue*/) {}
+
 //==============================================================================
 
 WaveTableSound::WaveTableSound()

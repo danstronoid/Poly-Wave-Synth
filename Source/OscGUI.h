@@ -32,19 +32,19 @@ public:
         oscType.addItem("Tri", 4);
         oscType.setJustificationType(Justification::centred);
         addAndMakeVisible(&oscType);
-        oscTypeAttach.reset(new ComboBoxAttachment(parameters, "oscType", oscType));
+        oscTypeAttach.reset(new ComboBoxAttachment(parameters, "osc_oscType", oscType));
 
-        gainSlider.setSliderStyle(Slider::RotaryHorizontalVerticalDrag);
-        gainSlider.setTextBoxStyle(Slider::NoTextBox, true, 0, 0);
-        gainSlider.setPopupDisplayEnabled(true, false, this);
-        addAndMakeVisible(&gainSlider);
-        gainAttach.reset(new SliderAttachment(parameters, "gain", gainSlider));
+        levelSlider.setSliderStyle(Slider::RotaryHorizontalVerticalDrag);
+        levelSlider.setTextBoxStyle(Slider::NoTextBox, true, 0, 0);
+        levelSlider.setPopupDisplayEnabled(true, false, this);
+        addAndMakeVisible(&levelSlider);
+        levelAttach.reset(new SliderAttachment(parameters, "osc_level", levelSlider));
 
         noiseSlider.setSliderStyle(Slider::RotaryHorizontalVerticalDrag);
         noiseSlider.setTextBoxStyle(Slider::NoTextBox, true, 0, 0);
         noiseSlider.setPopupDisplayEnabled(true, false, this);
         addAndMakeVisible(&noiseSlider);
-        noiseAttach.reset(new SliderAttachment(parameters, "noise", noiseSlider));
+        noiseAttach.reset(new SliderAttachment(parameters, "osc_noise", noiseSlider));
 
         freqSlider.setSliderStyle(Slider::RotaryHorizontalVerticalDrag);
         freqSlider.setTextBoxStyle(Slider::NoTextBox, true, 0, 0);
@@ -58,10 +58,10 @@ public:
         oscLabel.setJustificationType(Justification::centred);
         addAndMakeVisible(&oscLabel);
 
-        gainLabel.setText("Gain", dontSendNotification);
-        gainLabel.setJustificationType(Justification::centred);
-        addAndMakeVisible(&gainLabel);
-        gainLabel.attachToComponent(&gainSlider, false);
+        levelLabel.setText("Level", dontSendNotification);
+        levelLabel.setJustificationType(Justification::centred);
+        addAndMakeVisible(&levelLabel);
+        levelLabel.attachToComponent(&levelSlider, false);
 
         noiseLabel.setText("Noise", dontSendNotification);
         noiseLabel.setJustificationType(Justification::centred);
@@ -110,7 +110,7 @@ public:
         // bottom half
         area = getLocalBounds().reduced(padding);
         area.removeFromBottom(padding);
-        gainSlider.setBounds(area.removeFromLeft(rotaryWidth).removeFromBottom(rotaryHeight));
+        levelSlider.setBounds(area.removeFromLeft(rotaryWidth).removeFromBottom(rotaryHeight));
         noiseSlider.setBounds(area.removeFromLeft(rotaryWidth).removeFromBottom(rotaryHeight));
         freqSlider.setBounds(area.removeFromLeft(rotaryWidth).removeFromBottom(rotaryHeight));
     }
@@ -119,19 +119,20 @@ private:
     AudioProcessorValueTreeState& parameters;
 
     ComboBox oscType;
-    Slider gainSlider;
+    Slider levelSlider;
     Slider noiseSlider;
     Slider freqSlider;
 
     Label oscLabel;
-    Label gainLabel;
+    Label levelLabel;
     Label noiseLabel;
     Label freqLabel;
 
     std::unique_ptr<ComboBoxAttachment> oscTypeAttach;
-    std::unique_ptr<SliderAttachment> gainAttach;
+    std::unique_ptr<SliderAttachment> levelAttach;
     std::unique_ptr<SliderAttachment> noiseAttach;
     std::unique_ptr<SliderAttachment> freqAttach;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (OscGUI)
 };
+

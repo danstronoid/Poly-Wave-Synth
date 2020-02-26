@@ -14,10 +14,13 @@
 #include "Envelope.h"
 #include "StateVariableFilter.h"
 #include "Oscillator.h"
+#include "WaveTableGenerator.h"
+
+//==============================================================================
 
 // these are implemented as structs for ease of changing parameters
 struct WaveTableVoice : public SynthesiserVoice {
-	WaveTableVoice(const std::vector<AudioSampleBuffer>& oscTables, const std::vector<AudioSampleBuffer>& modTables);
+	WaveTableVoice(const WaveTableGenerator& tableGenerator, AudioBuffer<float>& controlBuffer);
 
 	bool isVoiceActive() const override;
 	bool canPlaySound(SynthesiserSound* sound) override;
@@ -30,15 +33,26 @@ struct WaveTableVoice : public SynthesiserVoice {
 	void pitchWheelMoved(int /*newPitchWheelValue*/) override;
 	void controllerMoved(int /*controllerNumber*/, int /*newControllerValue*/) override;
 
+	//==============================================================================
+
+	// noise generator
 	Random random;
+	float m_noise{ 0.0f };
+
+	// two oscillators
 	Oscillator m_osc;
 	Oscillator m_fmOsc;
+
+	// filter
 	StateVariableFilter m_svf;
+
+	// amp and filter envelopes
 	Envelope m_ampADSR;
 	Envelope m_filterADSR;
-
 	float m_envAmt{ 0.0f };
-	float m_noise{ 0.0f };
+
+	// a control buffer
+	AudioBuffer<float>& m_lfoBuffer;
 };
 
 //==============================================================================
