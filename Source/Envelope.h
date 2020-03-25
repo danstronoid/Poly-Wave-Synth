@@ -17,7 +17,7 @@ class Envelope {
 public:
 	Envelope();
 
-	void setSampleRate(int sampleRate);
+	void setSampleRate(double sampleRate);
 	void setParameters(float attack, float decay, float sus, float release);
 	float getNextSample();
 	void updateRates();
@@ -32,7 +32,7 @@ private:
 	enum class State { idle, attack, decay, sustain, release };
 	State currentState = State::idle;
 
-	int m_sampleRate{ 0 };
+	double m_sampleRate{ 0 };
 	float m_envValue{ 0.0f };
 	bool m_fastRelease{ false };
 

@@ -79,7 +79,7 @@ void WaveTableGenerator::generateSquareTable()
 		m_squareTable[octave].setSize(1, m_tableSize + 1);
 		m_squareTable[octave].clear();
 
-		int harm = m_tableSize / std::pow(2, octave + 1) - 1;
+		int harm = static_cast<int>(m_tableSize / std::pow(2, octave + 1) - 1);
 		Array<float> amps;
 
 		for (int i = 0; i < harm; i += 2)
@@ -98,7 +98,7 @@ void WaveTableGenerator::generateSawTable()
 		m_sawTable[octave].setSize(1, m_tableSize + 1);
 		m_sawTable[octave].clear();
 
-		int harm = m_tableSize / std::pow(2, octave + 1) - 1;
+		int harm = static_cast<int>(m_tableSize / std::pow(2, octave + 1) - 1);
 		Array<float> amps;
 
 		for (int i = 0; i < harm; ++i)
@@ -117,7 +117,7 @@ void WaveTableGenerator::generateTriTable()
 		m_triTable[octave].setSize(1, m_tableSize + 1);
 		m_triTable[octave].clear();
 
-		int harm = m_tableSize / std::pow(2, octave + 1) - 1;
+		int harm = static_cast<int>(m_tableSize / std::pow(2, octave + 1) - 1);
 		Array<float> amps;
 
 		for (int i = 0; i < harm; i += 2)

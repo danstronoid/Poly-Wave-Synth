@@ -20,7 +20,7 @@ class WaveSynthEngine : public Synthesiser {
 public:
 	WaveSynthEngine();
 
-	void setCurrentPlaybackSampleRate(double sampleRate) override;
+	void prepareToPlay(double currentSampleRate, int samplesPerBlock);
 	void renderNextBlock(AudioBuffer<float>& output, const MidiBuffer& inputMidi, 
 		int startSample, int numSamples);
 	void renderLfoBuffer(int startSample, int numSamples);

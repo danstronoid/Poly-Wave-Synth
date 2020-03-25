@@ -27,7 +27,7 @@ public:
     void setSampleRate(double sampleRate)
     {
         m_sampleRate = sampleRate;
-        m_sizeOverSR = static_cast<float>(m_tableSize) / m_sampleRate;
+        m_sizeOverSR = static_cast<float>(m_tableSize / m_sampleRate);
     }
 
     void setOscType(WaveType type)
@@ -51,7 +51,7 @@ public:
 
     void calculateDelta(float mod = 0)
     {
-        m_tableDelta = fmax(0, m_freq + mod * m_freq) * m_sizeOverSR;
+        m_tableDelta = fmax(0.0f, m_freq + mod * m_freq) * m_sizeOverSR;
     }
 
 
@@ -64,7 +64,7 @@ public:
         m_octave = midiNoteNumber / 12 - 1;
 
         if (!m_fixedFreq)
-            m_freq = MidiMessage::getMidiNoteInHertz(midiNoteNumber);
+            m_freq = static_cast<float>(MidiMessage::getMidiNoteInHertz(midiNoteNumber));
 
         m_tableDelta = (m_freq * m_multi) * m_sizeOverSR;
     }

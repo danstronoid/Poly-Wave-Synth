@@ -12,7 +12,7 @@
 
 Envelope::Envelope() {}
 
-void Envelope::setSampleRate(int sampleRate)
+void Envelope::setSampleRate(double sampleRate)
 {
 	m_sampleRate = sampleRate;
 }

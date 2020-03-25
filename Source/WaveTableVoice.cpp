@@ -35,7 +35,7 @@ bool WaveTableVoice::canPlaySound(SynthesiserSound* sound)
 	return dynamic_cast<WaveTableSound*>(sound) != nullptr;
 }
 
-void WaveTableVoice::startNote(int midiNoteNumber, float velocity, SynthesiserSound* sound,
+void WaveTableVoice::startNote(int midiNoteNumber, float velocity, SynthesiserSound* /*sound*/,
 	int /*currentPitchWheelPosition*/)
 {	
 	m_osc.noteOn(midiNoteNumber, velocity);
@@ -44,7 +44,7 @@ void WaveTableVoice::startNote(int midiNoteNumber, float velocity, SynthesiserSo
 	m_filterADSR.noteOn();
 }
 
-void WaveTableVoice::stopNote(float velocity, bool allowTailOff)
+void WaveTableVoice::stopNote(float /*velocity*/, bool allowTailOff)
 {
 	if (allowTailOff)
 	{

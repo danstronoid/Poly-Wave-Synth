@@ -21,7 +21,7 @@ class StateVariableFilter
 public:
     StateVariableFilter() {}
 
-    void setSampleRate(int sampleRate)
+    void setSampleRate(double sampleRate)
     {
         m_sampleRate = sampleRate;
         reset();
@@ -67,7 +67,7 @@ public:
 
 private:
     State m_currentState{ State::Low_Pass };
-    int m_sampleRate{};
+    double m_sampleRate{};
     double m_cutoff{};
     double m_q{};
 

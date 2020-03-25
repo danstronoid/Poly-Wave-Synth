@@ -21,13 +21,16 @@ WaveSynthEngine::WaveSynthEngine() :
 	addSound(new WaveTableSound);
 }
 
-void WaveSynthEngine::setCurrentPlaybackSampleRate(double sampleRate)
+void WaveSynthEngine::prepareToPlay(double currentSampleRate, int samplesPerBlock)
 {
-	m_lfo.setSampleRate(sampleRate);
+	m_lfo.setSampleRate(currentSampleRate);
+	m_lfoBuffer.setSize(1, samplesPerBlock);
 
-	Synthesiser::setCurrentPlaybackSampleRate(sampleRate);
+	Synthesiser::setCurrentPlaybackSampleRate(currentSampleRate);
 }
 
+// this is an override but not marked as such because the complier doesn't recognize it as one
+// I think this is because renderNextBlock is actually a template function
 void WaveSynthEngine::renderNextBlock(AudioBuffer<float>& output, const MidiBuffer& inputMidi, 
 	int startSample, int numSamples)
 {
@@ -39,7 +42,7 @@ void WaveSynthEngine::renderLfoBuffer(int startSample, int numSamples)
 {
 	m_lfo.calculateDelta();
 
-	// maybe move this to a prepare function
+	// this is being set in the perpare function, but I think it's safer to do it here as well
 	m_lfoBuffer.setSize(1, numSamples);
 
 	m_lfoBuffer.clear();

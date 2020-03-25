@@ -79,7 +79,7 @@ public:
     {
     }
 
-    void paint (Graphics& g) override
+    void paint (Graphics& /*g*/) override
     {
         //g.fillAll (getLookAndFeel().findColour (ResizableWindow::backgroundColourId));   // clear the background
 
