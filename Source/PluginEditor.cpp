@@ -34,17 +34,17 @@ PolyWaveSynthAudioProcessorEditor::~PolyWaveSynthAudioProcessorEditor()
 void PolyWaveSynthAudioProcessorEditor::paint (Graphics& g)
 {
     // (Our component is opaque, so we must completely fill the background with a solid colour)
-    g.fillAll (Colours::black);
+    g.fillAll (Colours::darkgrey.darker(1));
 
-    //Rectangle<float> smBox(componentWidth, componentHeight);
-    Rectangle<float> box(componentWidth * 3.0f, componentHeight);
+    // fill two separate sections for the osc and filter
+    /*Rectangle<int> box(componentWidth * 3, componentHeight);
     g.setColour(Colours::darkgrey);
     box.setPosition(padding, padding * 2);
-    g.fillRoundedRectangle(box, 10);
+    g.fillRect(box.toFloat());
 
     g.setColour(Colours::darkslategrey);
     box.setPosition(padding, componentHeight + padding * 2);
-    g.fillRoundedRectangle(box, 10);
+    g.fillRect(box.toFloat());*/
 }
 
 void PolyWaveSynthAudioProcessorEditor::resized()

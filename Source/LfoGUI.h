@@ -11,6 +11,7 @@
 #pragma once
 
 #include "../JuceLibraryCode/JuceHeader.h"
+#include "CustomSlider.h"
 
 //==============================================================================
 /*
@@ -33,12 +34,14 @@ public:
         typeAttach.reset(new ComboBoxAttachment(parameters, "lfo_type", lfoType));
 
         // Sliders
+        rateSlider.setLookAndFeel(&customSlider);
         rateSlider.setSliderStyle(Slider::RotaryHorizontalVerticalDrag);
         rateSlider.setTextBoxStyle(Slider::NoTextBox, true, 0, 0);
         rateSlider.setPopupDisplayEnabled(true, false, this);
         addAndMakeVisible(&rateSlider);
         rateAttach.reset(new SliderAttachment(parameters, "lfo_rate", rateSlider));
-
+        
+        depthSlider.setLookAndFeel(&customSlider);
         depthSlider.setSliderStyle(Slider::RotaryHorizontalVerticalDrag);
         depthSlider.setTextBoxStyle(Slider::NoTextBox, true, 0, 0);
         depthSlider.setPopupDisplayEnabled(true, false, this);
@@ -103,6 +106,8 @@ private:
     AudioProcessorValueTreeState& parameters;
 
     ComboBox lfoType;
+
+    CustomSlider customSlider;
 
     Slider rateSlider;
     Slider depthSlider;

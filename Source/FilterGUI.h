@@ -11,6 +11,8 @@
 #pragma once
 
 #include "../JuceLibraryCode/JuceHeader.h"
+#include "CustomSlider.h"
+
 typedef AudioProcessorValueTreeState::SliderAttachment SliderAttachment;
 typedef AudioProcessorValueTreeState::ComboBoxAttachment ComboBoxAttachment;
 
@@ -26,18 +28,21 @@ public:
         setSize(200, 200);
 
         // Sliders
+        cutoffSlider.setLookAndFeel(&customSlider);
         cutoffSlider.setSliderStyle(Slider::RotaryHorizontalVerticalDrag);
         cutoffSlider.setTextBoxStyle(Slider::NoTextBox, true, 0, 0);
         cutoffSlider.setPopupDisplayEnabled(true, false, this);
         addAndMakeVisible(&cutoffSlider);
         cutoffAttach.reset(new SliderAttachment(parameters, "filter_cutoff", cutoffSlider));
 
+        qSlider.setLookAndFeel(&customSlider);
         qSlider.setSliderStyle(Slider::RotaryHorizontalVerticalDrag);
         qSlider.setTextBoxStyle(Slider::NoTextBox, true, 0, 0); 
         qSlider.setPopupDisplayEnabled(true, false, this);
         addAndMakeVisible(&qSlider);
         qAttach.reset(new SliderAttachment(parameters, "filter_q", qSlider));
 
+        envAmtSlider.setLookAndFeel(&customSlider);
         envAmtSlider.setSliderStyle(Slider::RotaryHorizontalVerticalDrag);
         envAmtSlider.setTextBoxStyle(Slider::NoTextBox, true, 0, 0);
         envAmtSlider.setPopupDisplayEnabled(true, false, this);
@@ -118,6 +123,8 @@ public:
 
 private:
     AudioProcessorValueTreeState& parameters;
+
+    CustomSlider customSlider;
 
     Slider cutoffSlider;
     Slider qSlider;

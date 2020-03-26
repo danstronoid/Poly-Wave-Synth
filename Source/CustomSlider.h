@@ -18,8 +18,8 @@ public:
     CustomSlider()
     {
         // Color palette
-        Colour background = Colours::darkgrey.darker(1.0f);
-        Colour foreground = Colours::grey;
+        Colour background = Colours::darkgrey;
+        Colour foreground = Colours::grey.brighter();
         Colour accent = Colours::darkorange.darker(0.1f);
         Colour transparent = Colours::transparentWhite;
 

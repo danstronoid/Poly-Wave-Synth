@@ -47,8 +47,8 @@ private:
     FmGUI fmGUI;
     LfoGUI lfoGUI;
 
-    const int componentWidth = 200;
-    const int componentHeight = 200;
+    const int componentWidth = 240;
+    const int componentHeight = 240;
     const int padding = 0;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (PolyWaveSynthAudioProcessorEditor)

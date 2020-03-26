@@ -11,6 +11,8 @@
 #pragma once
 
 #include "../JuceLibraryCode/JuceHeader.h"
+#include "CustomSlider.h"
+
 typedef AudioProcessorValueTreeState::SliderAttachment SliderAttachment;
 typedef AudioProcessorValueTreeState::ComboBoxAttachment ComboBoxAttachment;
 
@@ -35,18 +37,21 @@ public:
         oscTypeAttach.reset(new ComboBoxAttachment(parameters, "fm_oscType", oscType));
 
         // Sliders
+        multiSlider.setLookAndFeel(&customSlider);
         multiSlider.setSliderStyle(Slider::RotaryHorizontalVerticalDrag);
         multiSlider.setTextBoxStyle(Slider::NoTextBox, true, 0, 0);
         multiSlider.setPopupDisplayEnabled(true, false, this);
         addAndMakeVisible(&multiSlider);
         multiAttach.reset(new SliderAttachment(parameters, "fm_multi", multiSlider));
 
+        freqSlider.setLookAndFeel(&customSlider);
         freqSlider.setSliderStyle(Slider::RotaryHorizontalVerticalDrag);
         freqSlider.setTextBoxStyle(Slider::NoTextBox, true, 0, 0);
         freqSlider.setPopupDisplayEnabled(true, false, this);
         addAndMakeVisible(&freqSlider);
         freqAttach.reset(new SliderAttachment(parameters, "fm_freq", freqSlider));
 
+        depthSlider.setLookAndFeel(&customSlider);
         depthSlider.setSliderStyle(Slider::RotaryHorizontalVerticalDrag);
         depthSlider.setTextBoxStyle(Slider::NoTextBox, true, 0, 0);
         depthSlider.setPopupDisplayEnabled(true, false, this);
@@ -116,6 +121,8 @@ private:
     AudioProcessorValueTreeState& parameters;
 
     ComboBox oscType;
+
+    CustomSlider customSlider;
 
     Slider multiSlider;
     Slider depthSlider;
