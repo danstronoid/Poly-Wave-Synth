@@ -30,7 +30,7 @@ public:
         setColour(Slider::rotarySliderFillColourId, accent);
         setColour(Slider::thumbColourId, foreground);
         setColour(Slider::textBoxTextColourId, accent);
-        setColour(Slider::textBoxBackgroundColourId, background);
+        setColour(Slider::textBoxBackgroundColourId, transparent);
         setColour(Slider::textBoxOutlineColourId, transparent);
         setColour(Slider::textBoxHighlightColourId, foreground);
         setColour(Label::textWhenEditingColourId, accent);
@@ -122,11 +122,20 @@ public:
             layout.textBoxBounds.setWidth(textBoxWidth);
             layout.textBoxBounds.setHeight(textBoxHeight);
 
-            // put the text box in the center of the rotary
+            // put the text box in the center of the rotary, or put it below
             if (slider.isRotary())
             {
-                layout.textBoxBounds.setX(bounds.getCentreX() - textBoxWidth / 2);
-                layout.textBoxBounds.setY(bounds.getCentreY() - textBoxHeight / 2);
+                if (slider.getTextBoxPosition() == Slider::TextBoxBelow) 
+                {
+                    layout.textBoxBounds.setX((bounds.getWidth() - textBoxWidth) / 2);
+                    layout.textBoxBounds.setY(bounds.getHeight() - textBoxHeight);
+                    layout.sliderBounds.removeFromBottom(textBoxHeight);
+                }
+                else
+                {
+                    layout.textBoxBounds.setX(bounds.getCentreX() - textBoxWidth / 2);
+                    layout.textBoxBounds.setY(bounds.getCentreY() - textBoxHeight / 2);
+                }       
             }
             // put the text box to the left of a horizontal slider
             else if (slider.isHorizontal())

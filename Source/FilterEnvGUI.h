@@ -28,29 +28,29 @@ public:
         // Sliders
         attackSlider.setLookAndFeel(&customSlider);
         attackSlider.setSliderStyle(Slider::LinearVertical);
-        attackSlider.setTextBoxStyle(Slider::NoTextBox, true, 0, 0);
-        attackSlider.setPopupDisplayEnabled(true, false, this);
+        attackSlider.setTextBoxStyle(Slider::TextBoxBelow, false, 40, 20);
+        //attackSlider.setPopupDisplayEnabled(true, false, this);
         addAndMakeVisible(&attackSlider);
         attackAttach.reset(new SliderAttachment(parameters, "filterEnv_attack", attackSlider));
 
         decaySlider.setLookAndFeel(&customSlider);
         decaySlider.setSliderStyle(Slider::LinearVertical);
-        decaySlider.setTextBoxStyle(Slider::NoTextBox, true, 0, 0);
-        decaySlider.setPopupDisplayEnabled(true, false, this);
+        decaySlider.setTextBoxStyle(Slider::TextBoxBelow, false, 40, 20);
+        //decaySlider.setPopupDisplayEnabled(true, false, this);
         addAndMakeVisible(&decaySlider);
         decayAttach.reset(new SliderAttachment(parameters, "filterEnv_decay", decaySlider));
 
         sustainSlider.setLookAndFeel(&customSlider);
         sustainSlider.setSliderStyle(Slider::LinearVertical);
-        sustainSlider.setTextBoxStyle(Slider::NoTextBox, true, 0, 0);
-        sustainSlider.setPopupDisplayEnabled(true, false, this);
+        sustainSlider.setTextBoxStyle(Slider::TextBoxBelow, false, 40, 20);
+        //sustainSlider.setPopupDisplayEnabled(true, false, this);
         addAndMakeVisible(&sustainSlider);
         sustainAttach.reset(new SliderAttachment(parameters, "filterEnv_sustain", sustainSlider));
 
         releaseSlider.setLookAndFeel(&customSlider);
         releaseSlider.setSliderStyle(Slider::LinearVertical);
-        releaseSlider.setTextBoxStyle(Slider::NoTextBox, true, 0, 0);
-        releaseSlider.setPopupDisplayEnabled(true, false, this);
+        releaseSlider.setTextBoxStyle(Slider::TextBoxBelow, false, 40, 20);
+        //releaseSlider.setPopupDisplayEnabled(true, false, this);
         addAndMakeVisible(&releaseSlider);
         releaseAttach.reset(new SliderAttachment(parameters, "filterEnv_release", releaseSlider));
 

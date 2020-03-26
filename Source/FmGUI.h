@@ -41,22 +41,22 @@ public:
         // Sliders
         multiSlider.setLookAndFeel(&customSlider);
         multiSlider.setSliderStyle(Slider::RotaryHorizontalVerticalDrag);
-        multiSlider.setTextBoxStyle(Slider::NoTextBox, true, 0, 0);
-        multiSlider.setPopupDisplayEnabled(true, false, this);
+        multiSlider.setTextBoxStyle(Slider::TextBoxBelow, false, 60, 20);
+        //multiSlider.setPopupDisplayEnabled(true, false, this);
         addAndMakeVisible(&multiSlider);
         multiAttach.reset(new SliderAttachment(parameters, "fm_multi", multiSlider));
 
         freqSlider.setLookAndFeel(&customSlider);
         freqSlider.setSliderStyle(Slider::RotaryHorizontalVerticalDrag);
-        freqSlider.setTextBoxStyle(Slider::NoTextBox, true, 0, 0);
-        freqSlider.setPopupDisplayEnabled(true, false, this);
+        freqSlider.setTextBoxStyle(Slider::TextBoxBelow, false, 60, 20);
+        //freqSlider.setPopupDisplayEnabled(true, false, this);
         addAndMakeVisible(&freqSlider);
         freqAttach.reset(new SliderAttachment(parameters, "fm_freq", freqSlider));
 
         depthSlider.setLookAndFeel(&customSlider);
         depthSlider.setSliderStyle(Slider::RotaryHorizontalVerticalDrag);
-        depthSlider.setTextBoxStyle(Slider::NoTextBox, true, 0, 0);
-        depthSlider.setPopupDisplayEnabled(true, false, this);
+        depthSlider.setTextBoxStyle(Slider::TextBoxBelow, false, 60, 20);
+        //depthSlider.setPopupDisplayEnabled(true, false, this);
         addAndMakeVisible(&depthSlider);
         depthAttach.reset(new SliderAttachment(parameters, "fm_depth", depthSlider));
 
@@ -100,14 +100,14 @@ public:
         Rectangle<int> area = getLocalBounds().reduced(padding);
 
         int rotaryWidth = area.getWidth() / 3;
-        int rotaryHeight = area.getHeight() / 3;
+        int rotaryHeight = area.getHeight() / 2;
         int boxWidth = area.getWidth() / 3;
         int boxHeight = padding * 2;
 
         // top half
         area.removeFromTop(padding);
-        fmLabel.setBounds(area.removeFromLeft(boxWidth).removeFromTop(rotaryHeight));
-        Rectangle<int> boxArea = area.removeFromRight(boxWidth * 2).removeFromTop(rotaryHeight);
+        fmLabel.setBounds(area.removeFromLeft(boxWidth).removeFromTop(rotaryHeight / 2));
+        Rectangle<int> boxArea = area.removeFromRight(boxWidth * 2).removeFromTop(rotaryHeight / 2);
         oscType.setBounds(boxArea.getX(), boxArea.getY() + boxArea.getHeight() / 2 - boxHeight / 2,
             boxArea.getWidth(), boxHeight);
 

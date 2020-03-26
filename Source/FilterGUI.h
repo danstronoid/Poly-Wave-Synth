@@ -31,22 +31,22 @@ public:
         // Sliders
         cutoffSlider.setLookAndFeel(&customSlider);
         cutoffSlider.setSliderStyle(Slider::RotaryHorizontalVerticalDrag);
-        cutoffSlider.setTextBoxStyle(Slider::NoTextBox, true, 0, 0);
-        cutoffSlider.setPopupDisplayEnabled(true, false, this);
+        cutoffSlider.setTextBoxStyle(Slider::TextBoxBelow, false, 60, 20);
+        //cutoffSlider.setPopupDisplayEnabled(true, false, this);
         addAndMakeVisible(&cutoffSlider);
         cutoffAttach.reset(new SliderAttachment(parameters, "filter_cutoff", cutoffSlider));
 
         qSlider.setLookAndFeel(&customSlider);
         qSlider.setSliderStyle(Slider::RotaryHorizontalVerticalDrag);
-        qSlider.setTextBoxStyle(Slider::NoTextBox, true, 0, 0); 
-        qSlider.setPopupDisplayEnabled(true, false, this);
+        qSlider.setTextBoxStyle(Slider::TextBoxBelow, false, 60, 20);
+        //qSlider.setPopupDisplayEnabled(true, false, this);
         addAndMakeVisible(&qSlider);
         qAttach.reset(new SliderAttachment(parameters, "filter_q", qSlider));
 
         envAmtSlider.setLookAndFeel(&customSlider);
         envAmtSlider.setSliderStyle(Slider::RotaryHorizontalVerticalDrag);
-        envAmtSlider.setTextBoxStyle(Slider::NoTextBox, true, 0, 0);
-        envAmtSlider.setPopupDisplayEnabled(true, false, this);
+        envAmtSlider.setTextBoxStyle(Slider::TextBoxBelow, false, 60, 20);
+        //envAmtSlider.setPopupDisplayEnabled(true, false, this);
         addAndMakeVisible(&envAmtSlider);
         envAmtAttach.reset(new SliderAttachment(parameters, "filter_envAmt", envAmtSlider));
 
@@ -102,14 +102,14 @@ public:
         const int padding = 10;
         Rectangle<int> area = getLocalBounds().reduced(padding);
         int rotaryWidth = area.getWidth() / 3;
-        int rotaryHeight = area.getHeight() / 3;
+        int rotaryHeight = area.getHeight() / 2;
         int boxWidth = area.getWidth() / 3;
         int boxHeight = padding * 2;
 
         // top half
         area.removeFromTop(padding);
-        filterLabel.setBounds(area.removeFromLeft(boxWidth).removeFromTop(rotaryHeight));
-        Rectangle<int> boxArea = area.removeFromLeft(boxWidth * 2).removeFromTop(rotaryHeight);
+        filterLabel.setBounds(area.removeFromLeft(boxWidth).removeFromTop(rotaryHeight / 2));
+        Rectangle<int> boxArea = area.removeFromLeft(boxWidth * 2).removeFromTop(rotaryHeight / 2);
         filterType.setBounds(boxArea.getX(), boxArea.getY() + boxArea.getHeight() / 2 - boxHeight / 2,
             boxArea.getWidth(), boxHeight);
 

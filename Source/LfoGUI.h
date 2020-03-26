@@ -38,15 +38,15 @@ public:
         // Sliders
         rateSlider.setLookAndFeel(&customSlider);
         rateSlider.setSliderStyle(Slider::RotaryHorizontalVerticalDrag);
-        rateSlider.setTextBoxStyle(Slider::NoTextBox, true, 0, 0);
-        rateSlider.setPopupDisplayEnabled(true, false, this);
+        rateSlider.setTextBoxStyle(Slider::TextBoxBelow, false, 60, 20);
+        //rateSlider.setPopupDisplayEnabled(true, false, this);
         addAndMakeVisible(&rateSlider);
         rateAttach.reset(new SliderAttachment(parameters, "lfo_rate", rateSlider));
         
         depthSlider.setLookAndFeel(&customSlider);
         depthSlider.setSliderStyle(Slider::RotaryHorizontalVerticalDrag);
-        depthSlider.setTextBoxStyle(Slider::NoTextBox, true, 0, 0);
-        depthSlider.setPopupDisplayEnabled(true, false, this);
+        depthSlider.setTextBoxStyle(Slider::TextBoxBelow, false, 60, 20);
+        //depthSlider.setPopupDisplayEnabled(true, false, this);
         addAndMakeVisible(&depthSlider);
         depthAttach.reset(new SliderAttachment(parameters, "lfo_depth", depthSlider));
 
@@ -86,14 +86,14 @@ public:
         Rectangle<int> area = getLocalBounds().reduced(padding);
 
         int rotaryWidth = area.getWidth() / 3;
-        int rotaryHeight = area.getHeight() / 3;
+        int rotaryHeight = area.getHeight() / 2;
         int boxWidth = area.getWidth() / 3;
         int boxHeight = padding * 2;
 
         // top half
         area.removeFromTop(padding);
-        lfoLabel.setBounds(area.removeFromLeft(boxWidth).removeFromTop(rotaryHeight));
-        Rectangle<int> boxArea = area.removeFromRight(boxWidth * 2).removeFromTop(rotaryHeight);
+        lfoLabel.setBounds(area.removeFromLeft(boxWidth).removeFromTop(rotaryHeight / 2));
+        Rectangle<int> boxArea = area.removeFromRight(boxWidth * 2).removeFromTop(rotaryHeight / 2);
         lfoType.setBounds(boxArea.getX(), boxArea.getY() + boxArea.getHeight() / 2 - boxHeight / 2,
             boxArea.getWidth(), boxHeight);
 
@@ -101,7 +101,7 @@ public:
         area = getLocalBounds().reduced(padding);
         area.removeFromBottom(padding);
         rateSlider.setBounds(area.removeFromLeft(rotaryWidth).removeFromBottom(rotaryHeight));
-        depthSlider.setBounds(area.removeFromBottom(rotaryHeight));
+        depthSlider.setBounds(area.removeFromRight(rotaryWidth).removeFromBottom(rotaryHeight));
     }
 
 private:

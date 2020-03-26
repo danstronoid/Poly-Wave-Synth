@@ -40,22 +40,22 @@ public:
 
         levelSlider.setLookAndFeel(&customSlider);
         levelSlider.setSliderStyle(Slider::RotaryHorizontalVerticalDrag);
-        levelSlider.setTextBoxStyle(Slider::NoTextBox, true, 0, 0);
-        levelSlider.setPopupDisplayEnabled(true, false, this);
+        levelSlider.setTextBoxStyle(Slider::TextBoxBelow, false, 60, 20);
+        //levelSlider.setPopupDisplayEnabled(true, false, this);
         addAndMakeVisible(&levelSlider);
         levelAttach.reset(new SliderAttachment(parameters, "osc_level", levelSlider));
 
         noiseSlider.setLookAndFeel(&customSlider);
         noiseSlider.setSliderStyle(Slider::RotaryHorizontalVerticalDrag);
-        noiseSlider.setTextBoxStyle(Slider::NoTextBox, true, 0, 0);
-        noiseSlider.setPopupDisplayEnabled(true, false, this);
+        noiseSlider.setTextBoxStyle(Slider::TextBoxBelow, false, 60, 20);
+        //noiseSlider.setPopupDisplayEnabled(true, false, this);
         addAndMakeVisible(&noiseSlider);
         noiseAttach.reset(new SliderAttachment(parameters, "osc_noise", noiseSlider));
 
         freqSlider.setLookAndFeel(&customSlider);
         freqSlider.setSliderStyle(Slider::RotaryHorizontalVerticalDrag);
-        freqSlider.setTextBoxStyle(Slider::NoTextBox, true, 0, 0);
-        freqSlider.setPopupDisplayEnabled(true, false, this);
+        freqSlider.setTextBoxStyle(Slider::TextBoxBelow, false, 60, 20);
+        //freqSlider.setPopupDisplayEnabled(true, false, this);
         addAndMakeVisible(&freqSlider);
         freqAttach.reset(new SliderAttachment(parameters, "osc_freq", freqSlider));
 
@@ -103,14 +103,14 @@ public:
         Rectangle<int> area = getLocalBounds().reduced(padding);
      
         int rotaryWidth = area.getWidth() / 3;
-        int rotaryHeight = area.getHeight() / 3;
+        int rotaryHeight = area.getHeight() / 2;
         int boxWidth = area.getWidth() / 3;
         int boxHeight = padding * 2;
 
         // top half
         area.removeFromTop(padding);
-        oscLabel.setBounds(area.removeFromLeft(boxWidth).removeFromTop(rotaryHeight));
-        Rectangle<int> boxArea = area.removeFromRight(boxWidth * 2).removeFromTop(rotaryHeight);
+        oscLabel.setBounds(area.removeFromLeft(boxWidth).removeFromTop(rotaryHeight / 2));
+        Rectangle<int> boxArea = area.removeFromRight(boxWidth * 2).removeFromTop(rotaryHeight / 2);
         oscType.setBounds(boxArea.getX(), boxArea.getY() + boxArea.getHeight() / 2 - boxHeight / 2,
             boxArea.getWidth(), boxHeight);
 
