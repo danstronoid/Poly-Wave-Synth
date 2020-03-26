@@ -12,6 +12,7 @@
 
 #include "../JuceLibraryCode/JuceHeader.h"
 #include "CustomSlider.h"
+#include "CustomBox.h"
 
 typedef AudioProcessorValueTreeState::SliderAttachment SliderAttachment;
 typedef AudioProcessorValueTreeState::ComboBoxAttachment ComboBoxAttachment;
@@ -49,6 +50,7 @@ public:
         addAndMakeVisible(&envAmtSlider);
         envAmtAttach.reset(new SliderAttachment(parameters, "filter_envAmt", envAmtSlider));
 
+        filterType.setLookAndFeel(&customBox);
         filterType.addItem("Low Pass", 1); 
         filterType.addItem("High Pass", 2);
         filterType.addItem("Band Pass", 3);
@@ -125,6 +127,7 @@ private:
     AudioProcessorValueTreeState& parameters;
 
     CustomSlider customSlider;
+    CustomBox customBox;
 
     Slider cutoffSlider;
     Slider qSlider;

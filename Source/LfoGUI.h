@@ -12,6 +12,7 @@
 
 #include "../JuceLibraryCode/JuceHeader.h"
 #include "CustomSlider.h"
+#include "CustomBox.h"
 
 //==============================================================================
 /*
@@ -25,6 +26,7 @@ public:
         setSize(200, 200);
 
         // Box
+        lfoType.setLookAndFeel(&customBox);
         lfoType.addItem("Sine", 1);
         lfoType.addItem("Square", 2);
         lfoType.addItem("Saw", 3);
@@ -108,6 +110,7 @@ private:
     ComboBox lfoType;
 
     CustomSlider customSlider;
+    CustomBox customBox;
 
     Slider rateSlider;
     Slider depthSlider;

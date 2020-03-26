@@ -12,6 +12,7 @@
 
 #include "../JuceLibraryCode/JuceHeader.h"
 #include "CustomSlider.h"
+#include "CustomBox.h"
 
 typedef AudioProcessorValueTreeState::SliderAttachment SliderAttachment;
 typedef AudioProcessorValueTreeState::ComboBoxAttachment ComboBoxAttachment;
@@ -28,6 +29,7 @@ public:
         setSize(200, 200);
 
         // Box
+        oscType.setLookAndFeel(&customBox);
         oscType.addItem("Sine", 1);
         oscType.addItem("Square", 2);
         oscType.addItem("Saw", 3);
@@ -123,6 +125,7 @@ private:
     ComboBox oscType;
 
     CustomSlider customSlider;
+    CustomBox customBox;
 
     Slider multiSlider;
     Slider depthSlider;
