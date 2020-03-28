@@ -203,7 +203,7 @@ AudioProcessorValueTreeState::ParameterLayout PolyWaveSynthAudioProcessor::creat
     params.push_back(std::make_unique<AudioParameterFloat>("osc_level", "OscLevel", 0.0f, 0.6f, 0.3f));
     params.push_back(std::make_unique<AudioParameterFloat>("osc_noise", "Noise", 0.0f, 0.3f, 0.0f));
     params.push_back(std::make_unique<AudioParameterFloat>("osc_freq", "OscFreq", 
-        frequencyRange(20.0f, 12000.0f, 0.01f), 20.0f));
+        frequencyRange(20.0f, 12000.0f, 1.0f), 20.0f));
     params.push_back(std::make_unique<AudioParameterFloat>("ampEnv_attack", "Attack", 0.001f, 2.0f, 0.001f));
     params.push_back(std::make_unique<AudioParameterFloat>("ampEnv_decay", "Decay", 0.001f, 2.0f, 0.01f));
     params.push_back(std::make_unique<AudioParameterFloat>("ampEnv_sustain", "Sustain", 0.0f, 1.0f, 1.0f));
@@ -211,13 +211,13 @@ AudioProcessorValueTreeState::ParameterLayout PolyWaveSynthAudioProcessor::creat
     params.push_back(std::make_unique<AudioParameterInt>("fm_oscType", "FMOscType", 0, 3, 0));
     params.push_back(std::make_unique<AudioParameterFloat>("fm_multi", "Multi", 0.0f, 4.0f, 1.0f));
     params.push_back(std::make_unique<AudioParameterFloat>("fm_freq", "FMFreq", 
-        frequencyRange(20.0f, 12000.0f, 0.01f), 20.0f));
+        frequencyRange(20.0f, 12000.0f, 1.0f), 20.0f));
     params.push_back(std::make_unique<AudioParameterFloat>("fm_depth", "Depth", 0.0f, 1.0f, 0.0f));
 
     // filter parameters
     params.push_back(std::make_unique<AudioParameterInt>("filter_type", "FilterType", 0, 2, 0));
     params.push_back(std::make_unique<AudioParameterFloat>("filter_cutoff", "Cufoff", 
-        frequencyRange(40.0f, 19000.0f, 0.01f), 19000.0f));
+        frequencyRange(40.0f, 19000.0f, 1.0f), 19000.0f));
     params.push_back(std::make_unique<AudioParameterFloat>("filter_q", "Q", 0.1f, 5.0f, 1.0f));
     params.push_back(std::make_unique<AudioParameterFloat>("filter_envAmt", "Env", 0.0f, 1.0f, 0.0f));
     params.push_back(std::make_unique<AudioParameterFloat>("filterEnv_attack", "Attack", 0.001f, 2.0f, 0.01f));

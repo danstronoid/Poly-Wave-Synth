@@ -32,8 +32,8 @@ public:
         oscType.setLookAndFeel(&customBox);
         oscType.addItem("Sine", 1);
         oscType.addItem("Square", 2);
-        oscType.addItem("Saw", 3);
-        oscType.addItem("Tri", 4);
+        oscType.addItem("Sawtooth", 3);
+        oscType.addItem("Triangle", 4);
         oscType.setJustificationType(Justification::centred);
         addAndMakeVisible(&oscType);
         oscTypeAttach.reset(new ComboBoxAttachment(parameters, "fm_oscType", oscType));
@@ -49,6 +49,7 @@ public:
         freqSlider.setLookAndFeel(&customSlider);
         freqSlider.setSliderStyle(Slider::RotaryHorizontalVerticalDrag);
         freqSlider.setTextBoxStyle(Slider::TextBoxBelow, false, 60, 20);
+        freqSlider.setTextValueSuffix(" Hz");
         //freqSlider.setPopupDisplayEnabled(true, false, this);
         addAndMakeVisible(&freqSlider);
         freqAttach.reset(new SliderAttachment(parameters, "fm_freq", freqSlider));
@@ -56,6 +57,7 @@ public:
         depthSlider.setLookAndFeel(&customSlider);
         depthSlider.setSliderStyle(Slider::RotaryHorizontalVerticalDrag);
         depthSlider.setTextBoxStyle(Slider::TextBoxBelow, false, 60, 20);
+        //depthSlider.textFromValueFunction(); // use a lambda to alter the text
         //depthSlider.setPopupDisplayEnabled(true, false, this);
         addAndMakeVisible(&depthSlider);
         depthAttach.reset(new SliderAttachment(parameters, "fm_depth", depthSlider));

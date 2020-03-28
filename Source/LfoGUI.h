@@ -29,8 +29,8 @@ public:
         lfoType.setLookAndFeel(&customBox);
         lfoType.addItem("Sine", 1);
         lfoType.addItem("Square", 2);
-        lfoType.addItem("Saw", 3);
-        lfoType.addItem("Tri", 4);
+        lfoType.addItem("Sawtooth", 3);
+        lfoType.addItem("Triangle", 4);
         lfoType.setJustificationType(Justification::centred);
         addAndMakeVisible(&lfoType);
         typeAttach.reset(new ComboBoxAttachment(parameters, "lfo_type", lfoType));
@@ -39,6 +39,7 @@ public:
         rateSlider.setLookAndFeel(&customSlider);
         rateSlider.setSliderStyle(Slider::RotaryHorizontalVerticalDrag);
         rateSlider.setTextBoxStyle(Slider::TextBoxBelow, false, 60, 20);
+        rateSlider.setTextValueSuffix(" Hz");
         //rateSlider.setPopupDisplayEnabled(true, false, this);
         addAndMakeVisible(&rateSlider);
         rateAttach.reset(new SliderAttachment(parameters, "lfo_rate", rateSlider));

@@ -32,6 +32,7 @@ public:
         cutoffSlider.setLookAndFeel(&customSlider);
         cutoffSlider.setSliderStyle(Slider::RotaryHorizontalVerticalDrag);
         cutoffSlider.setTextBoxStyle(Slider::TextBoxBelow, false, 60, 20);
+        cutoffSlider.setTextValueSuffix(" Hz");
         //cutoffSlider.setPopupDisplayEnabled(true, false, this);
         addAndMakeVisible(&cutoffSlider);
         cutoffAttach.reset(new SliderAttachment(parameters, "filter_cutoff", cutoffSlider));

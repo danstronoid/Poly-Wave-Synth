@@ -11,6 +11,7 @@
 #pragma once
 
 #include "../JuceLibraryCode/JuceHeader.h"
+#include "ColorPalette.h"
 
 class CustomSlider : public LookAndFeel_V4
 {
@@ -18,22 +19,26 @@ public:
     CustomSlider()
     {
         // Color palette
-        Colour background = Colours::darkgrey;
-        Colour foreground = Colours::grey.brighter();
-        Colour accent = Colours::darkorange.darker(0.1f);
-        Colour transparent = Colours::transparentWhite;
+        ColorPalette palette;
 
-        // init colors
-        setColour(Slider::backgroundColourId, background);
-        setColour(Slider::rotarySliderOutlineColourId, background);
-        setColour(Slider::trackColourId, accent);
-        setColour(Slider::rotarySliderFillColourId, accent);
-        setColour(Slider::thumbColourId, foreground);
-        setColour(Slider::textBoxTextColourId, accent);
-        setColour(Slider::textBoxBackgroundColourId, transparent);
-        setColour(Slider::textBoxOutlineColourId, transparent);
-        setColour(Slider::textBoxHighlightColourId, foreground);
-        setColour(Label::textWhenEditingColourId, accent);
+        // slider
+        setColour(Slider::backgroundColourId, palette.background);
+        setColour(Slider::rotarySliderOutlineColourId, palette.background);
+        setColour(Slider::trackColourId, palette.accent);
+        setColour(Slider::rotarySliderFillColourId, palette.accent);
+        setColour(Slider::thumbColourId, palette.foreground);
+
+        // text box
+        setColour(Slider::textBoxTextColourId, palette.textBright);
+        setColour(Slider::textBoxBackgroundColourId, palette.transparent);
+        setColour(Slider::textBoxOutlineColourId, palette.transparent);
+
+        // highlighted text box
+        setColour(Slider::textBoxHighlightColourId, palette.accent);
+        setColour(TextEditor::highlightedTextColourId, palette.textDark);
+        setColour(Label::backgroundWhenEditingColourId, palette.transparent);
+        setColour(Label::outlineWhenEditingColourId, palette.transparent);
+        setColour(Label::textWhenEditingColourId, palette.accent);
     }
 
     // Draws a linear vertical or horizontal sliders.  This does not implement multi point sliders.

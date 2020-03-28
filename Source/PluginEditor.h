@@ -40,6 +40,9 @@ private:
     PolyWaveSynthAudioProcessor& processor;
     AudioProcessorValueTreeState& parameters;
 
+    ColorPalette palette;
+    Label title;
+
     AmpEnvGUI ampEnvGUI;
     OscGUI oscGUI;
     FilterGUI filterGUI;
@@ -49,7 +52,7 @@ private:
 
     const int componentWidth = 240;
     const int componentHeight = 240;
-    const int padding = 0;
+    const int padding = 40;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (PolyWaveSynthAudioProcessorEditor)
 };

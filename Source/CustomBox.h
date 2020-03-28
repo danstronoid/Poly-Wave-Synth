@@ -11,6 +11,7 @@
 #pragma once
 
 #include "../JuceLibraryCode/JuceHeader.h"
+#include "ColorPalette.h"
 
 class CustomBox : public LookAndFeel_V4
 {
@@ -18,21 +19,18 @@ public:
     CustomBox()
     {
         // Color palette
-        Colour background = Colours::darkgrey;
-        Colour foreground = Colours::grey;
-        Colour bright = Colours::ghostwhite;
-        Colour accent = Colours::darkorange.darker(0.1f);
-        Colour transparent = Colours::transparentWhite;
+        ColorPalette palette;
 
         // init colors
-        setColour(ComboBox::backgroundColourId, background);
-        setColour(ComboBox::outlineColourId, transparent);
-        setColour(ComboBox::arrowColourId, bright);
-        setColour(ComboBox::textColourId, bright);
+        setColour(ComboBox::backgroundColourId, palette.background);
+        setColour(ComboBox::outlineColourId, palette.transparent);
+        setColour(ComboBox::arrowColourId, palette.textBright);
+        setColour(ComboBox::textColourId, palette.textBright);
 
-        setColour(PopupMenu::backgroundColourId, background);
-        setColour(PopupMenu::textColourId, bright);
-        setColour(PopupMenu::highlightedBackgroundColourId, accent);
+        setColour(PopupMenu::backgroundColourId, palette.background);
+        setColour(PopupMenu::textColourId, palette.textBright);
+        setColour(PopupMenu::highlightedTextColourId, palette.textDark);
+        setColour(PopupMenu::highlightedBackgroundColourId, palette.accent);
     }
 
     void drawComboBox(Graphics& g, int width, int height, bool,
