@@ -34,21 +34,30 @@ void WaveSynthEngine::prepareToPlay(double currentSampleRate, int samplesPerBloc
 void WaveSynthEngine::renderNextBlock(AudioBuffer<float>& output, const MidiBuffer& inputMidi, 
 	int startSample, int numSamples)
 {
-	renderLfoBuffer(startSample, numSamples);
+	renderLfoBuffer(inputMidi, startSample, numSamples);
 	Synthesiser::renderNextBlock(output, inputMidi, startSample, numSamples);
 }
 
-void WaveSynthEngine::renderLfoBuffer(int startSample, int numSamples)
+void WaveSynthEngine::renderLfoBuffer(const MidiBuffer& inputMidi, int startSample, int numSamples)
 {
 	m_lfo.calculateDelta();
 
-	// this is being set in the perpare function, but I think it's safer to do it here as well
-	m_lfoBuffer.setSize(1, numSamples);
-
 	m_lfoBuffer.clear();
+
+	MidiBuffer::Iterator midiIt(inputMidi);
+	MidiMessage m;
+	int midiPos;
 
 	while (--numSamples >= 0)
 	{
+		midiIt.setNextSamplePosition(startSample);
+
+		// if the lfo is set to retrigger, reset the osc position on a note on message
+		if (m_lfoReTrigger && midiIt.getNextEvent(m, midiPos) && startSample == midiPos && m.isNoteOn())
+		{
+			m_lfo.resetPos();
+		}
+
 		float currentSample = m_lfo.getNextSample();
 		m_lfoBuffer.addSample(0, startSample, currentSample);
 		++startSample;
@@ -128,9 +137,10 @@ void WaveSynthEngine::setFilterLFOType(WaveType type)
 	m_lfo.setOscType(type);
 }
 
-void WaveSynthEngine::setFilterLFO(float rate, float depth)
+void WaveSynthEngine::setFilterLFO(float rate, float depth, bool trigger)
 {
 	m_lfo.setParameters(rate, depth, 1, true, true);
+	m_lfoReTrigger = trigger;
 }
 
 //==============================================================================

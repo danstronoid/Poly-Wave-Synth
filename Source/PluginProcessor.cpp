@@ -228,6 +228,7 @@ AudioProcessorValueTreeState::ParameterLayout PolyWaveSynthAudioProcessor::creat
     params.push_back(std::make_unique<AudioParameterInt>("lfo_type", "LFOType", 0, 3, 0));
     params.push_back(std::make_unique<AudioParameterFloat>("lfo_rate", "LFORate", 0.01f, 20.0f, 2.0f));
     params.push_back(std::make_unique<AudioParameterFloat>("lfo_depth", "LFODepth", 0.0f, 1.0f, 0.0f));
+    params.push_back(std::make_unique<AudioParameterBool>("lfo_trigger", "LFOTrigger", false));
 
     return { params.begin(), params.end() };
 }
@@ -264,6 +265,7 @@ void PolyWaveSynthAudioProcessor::addParameterListeners()
     parameters.addParameterListener("lfo_type", this);
     parameters.addParameterListener("lfo_rate", this);
     parameters.addParameterListener("lfo_depth", this);
+    parameters.addParameterListener("lfo_trigger", this);
 }
 
 // initialize all parameters
@@ -387,7 +389,8 @@ void PolyWaveSynthAudioProcessor::updateFilterLFO()
 
     auto* lfo_rate = parameters.getRawParameterValue("lfo_rate");
     auto* lfo_depth = parameters.getRawParameterValue("lfo_depth");
-    synthEngine.setFilterLFO(*lfo_rate, *lfo_depth);
+    auto* lfo_trigger = parameters.getRawParameterValue("lfo_trigger");
+    synthEngine.setFilterLFO(*lfo_rate, *lfo_depth, *lfo_trigger);
 }
 
 //==============================================================================

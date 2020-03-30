@@ -23,7 +23,7 @@ public:
 	void prepareToPlay(double currentSampleRate, int samplesPerBlock);
 	void renderNextBlock(AudioBuffer<float>& output, const MidiBuffer& inputMidi, 
 		int startSample, int numSamples);
-	void renderLfoBuffer(int startSample, int numSamples);
+	void renderLfoBuffer(const MidiBuffer& inputMidi, int startSample, int numSamples);
 
 
 	void setOscType(WaveType type);
@@ -36,7 +36,7 @@ public:
 	void setFilterParameters(State state, double cutoff, double q, float envAmt);
 	void setFilterADSR(float attack, float decay, float sustain, float release);
 	void setFilterLFOType(WaveType type);
-	void setFilterLFO(float rate, float depth);
+	void setFilterLFO(float rate, float depth, bool trigger);
 
 private:
 	const int m_maxVoices{ 8 };
@@ -47,6 +47,7 @@ private:
 
 	// the synth engine has an lfo that's written to a buffer and fed to the voices
 	Oscillator m_lfo;
+	bool m_lfoReTrigger{false};
 	AudioBuffer<float> m_lfoBuffer;
 };
 

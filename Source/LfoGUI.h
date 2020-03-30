@@ -15,6 +15,8 @@
 #include "CustomBox.h"
 #include "PercentSlider.h"
 
+typedef AudioProcessorValueTreeState::ButtonAttachment ButtonAttachment;
+
 //==============================================================================
 /*
 */
@@ -51,6 +53,12 @@ public:
         //depthSlider.setPopupDisplayEnabled(true, false, this);
         addAndMakeVisible(&depthSlider);
         depthAttach.reset(new SliderAttachment(parameters, "lfo_depth", depthSlider));
+
+        // Buttons
+        triggerButton.setButtonText("Trigger");
+        //triggerButton.setClickingTogglesState(true);
+        addAndMakeVisible(&triggerButton);
+        triggerAttach.reset(new ButtonAttachment(parameters, "lfo_trigger", triggerButton));
 
         // Labels
         lfoLabel.setText("LFO", dontSendNotification);
@@ -103,7 +111,8 @@ public:
         area = getLocalBounds().reduced(padding);
         area.removeFromBottom(padding);
         rateSlider.setBounds(area.removeFromLeft(rotaryWidth).removeFromBottom(rotaryHeight));
-        depthSlider.setBounds(area.removeFromRight(rotaryWidth).removeFromBottom(rotaryHeight));
+        depthSlider.setBounds(area.removeFromLeft(rotaryWidth).removeFromBottom(rotaryHeight));
+        triggerButton.setBounds(area.removeFromLeft(rotaryWidth).removeFromBottom(rotaryHeight));
     }
 
 private:
@@ -117,12 +126,15 @@ private:
     Slider rateSlider;
     PercentSlider depthSlider;
 
+    ToggleButton triggerButton;
+
     Label rateLabel;
     Label depthLabel; 
     Label lfoLabel;
 
     std::unique_ptr<SliderAttachment> rateAttach;
     std::unique_ptr<SliderAttachment> depthAttach;
+    std::unique_ptr<ButtonAttachment> triggerAttach;
     std::unique_ptr<ComboBoxAttachment> typeAttach;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (LfoGUI)
