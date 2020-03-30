@@ -13,6 +13,7 @@
 #include "../JuceLibraryCode/JuceHeader.h"
 #include "CustomSlider.h"
 #include "CustomBox.h"
+#include "DecibelSlider.h"
 
 typedef AudioProcessorValueTreeState::SliderAttachment SliderAttachment;
 typedef AudioProcessorValueTreeState::ComboBoxAttachment ComboBoxAttachment;
@@ -131,8 +132,8 @@ private:
     CustomBox customBox;
 
     ComboBox oscType;
-    Slider levelSlider;
-    Slider noiseSlider;
+    DecibelSlider levelSlider;
+    DecibelSlider noiseSlider;
     Slider freqSlider;
 
     Label oscLabel;

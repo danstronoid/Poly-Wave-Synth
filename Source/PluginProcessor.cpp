@@ -190,18 +190,19 @@ NormalisableRange<float> frequencyRange(float min, float max, float interval)
     return { min, max, interval, 1.0f / std::log2(1.0f + std::sqrt(max / min)) };
 }
 
+
 // create the parameters for the constructor
 AudioProcessorValueTreeState::ParameterLayout PolyWaveSynthAudioProcessor::createParameterLayout()
 {
     std::vector< std::unique_ptr<RangedAudioParameter> > params;
 
     // master parameters
-    params.push_back(std::make_unique<AudioParameterFloat>("gain", "Gain", 0.0f, 1.0f, 0.6f));
+    params.push_back(std::make_unique<AudioParameterFloat>("gain", "Gain", NormalisableRange<float>(0.0f, 1.0f), 1.0f));
 
     // osciallator parameters
     params.push_back(std::make_unique<AudioParameterInt>("osc_oscType", "OscType", 0, 3, 0));
-    params.push_back(std::make_unique<AudioParameterFloat>("osc_level", "OscLevel", 0.0f, 0.6f, 0.3f));
-    params.push_back(std::make_unique<AudioParameterFloat>("osc_noise", "Noise", 0.0f, 0.3f, 0.0f));
+    params.push_back(std::make_unique<AudioParameterFloat>("osc_level", "OscLevel", NormalisableRange<float>(0.0f, 1.0f), 0.5f));
+    params.push_back(std::make_unique<AudioParameterFloat>("osc_noise", "Noise", NormalisableRange<float>(0.0f, 1.0f), 0.0f));
     params.push_back(std::make_unique<AudioParameterFloat>("osc_freq", "OscFreq", 
         frequencyRange(20.0f, 12000.0f, 1.0f), 20.0f));
     params.push_back(std::make_unique<AudioParameterFloat>("ampEnv_attack", "Attack", 0.001f, 2.0f, 0.001f));
@@ -269,6 +270,12 @@ void PolyWaveSynthAudioProcessor::addParameterListeners()
 void PolyWaveSynthAudioProcessor::initParameters()
 {
     // this is a cheeky way of initializing values, probably a better way
+
+    // update the output gain
+    auto* output_level = parameters.getRawParameterValue("gain");
+    currentGain = *output_level;
+
+    // call all other update functions
     updateOsc();
     updateFM();
     updateAmpEnv();
@@ -315,6 +322,9 @@ void PolyWaveSynthAudioProcessor::parameterChanged(const String& parameterID, fl
 
 void PolyWaveSynthAudioProcessor::updateOsc()
 {
+    // This is a modest level scale to the osc levels
+    const float oscLevelScale = 0.6f;
+
     auto* osc_oscType = parameters.getRawParameterValue("osc_oscType");
     synthEngine.setOscType(static_cast<WaveType>((int)*osc_oscType));
 
@@ -327,7 +337,7 @@ void PolyWaveSynthAudioProcessor::updateOsc()
     auto oscRange = parameters.getParameterRange("osc_freq");
     bool oscFixed = oscRange.convertTo0to1(*osc_freq);
 
-    synthEngine.setOscParameters(*osc_level, *osc_noise, *osc_freq, oscFixed);
+    synthEngine.setOscParameters(*osc_level * oscLevelScale, *osc_noise * oscLevelScale, *osc_freq, oscFixed);
 }
 
 void PolyWaveSynthAudioProcessor::updateFM() 

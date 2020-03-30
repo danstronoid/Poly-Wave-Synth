@@ -18,9 +18,6 @@ class CustomBox : public LookAndFeel_V4
 public:
     CustomBox()
     {
-        // Color palette
-        ColorPalette palette;
-
         // init colors
         setColour(ComboBox::backgroundColourId, palette.background);
         setColour(ComboBox::outlineColourId, palette.transparent);
@@ -55,5 +52,6 @@ public:
     }
 
 private:
-
+    // Color palette
+    ColorPalette palette;
 };

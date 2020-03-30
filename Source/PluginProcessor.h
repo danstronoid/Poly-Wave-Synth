@@ -86,8 +86,8 @@ private:
 	AudioProcessorValueTreeState parameters;
 	WaveSynthEngine synthEngine;
 
-	float currentGain{ 0.6f };
-	float previousGain{ 0.6f };
+	float currentGain{ 1.0f };
+	float previousGain{ 1.0f };
 
     //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (PolyWaveSynthAudioProcessor)

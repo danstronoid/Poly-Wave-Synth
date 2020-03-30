@@ -18,9 +18,6 @@ class CustomSlider : public LookAndFeel_V4
 public:
     CustomSlider()
     {
-        // Color palette
-        ColorPalette palette;
-
         // slider
         setColour(Slider::backgroundColourId, palette.background);
         setColour(Slider::rotarySliderOutlineColourId, palette.background);
@@ -162,6 +159,10 @@ public:
     }
 
 private:
+
+    // Color palette
+    ColorPalette palette;
+
     const float trackWidth = 6.0f;
     const float thumbWidth = 18.0f;
     const float thumbHeight = 6.0f;

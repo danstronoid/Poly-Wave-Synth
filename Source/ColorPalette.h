@@ -18,7 +18,7 @@ struct ColorPalette
     Colour window = Colours::darkgrey.darker(1);
     Colour background = Colours::darkgrey;
     Colour foreground = Colours::grey.brighter();
-    Colour accent = Colours::darkorange.darker(0.1f);
+    Colour accent = Colours::deepskyblue;//Colours::darkorange.darker(0.1f);
     Colour textBright = Colours::ghostwhite;
     Colour textDark = Colours::black;
     Colour transparent = Colours::transparentWhite;

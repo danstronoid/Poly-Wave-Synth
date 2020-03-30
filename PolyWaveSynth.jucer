@@ -24,6 +24,8 @@
       </GROUP>
       <GROUP id="{C2DF9C4A-BFED-A1E9-F3AB-6ED9A705830B}" name="GUI">
         <FILE id="tl1RuV" name="ColorPalette.h" compile="0" resource="0" file="Source/ColorPalette.h"/>
+        <FILE id="Q2ENig" name="PercentSlider.h" compile="0" resource="0" file="Source/PercentSlider.h"/>
+        <FILE id="l8Tol3" name="DecibelSlider.h" compile="0" resource="0" file="Source/DecibelSlider.h"/>
         <FILE id="NmFoLi" name="CustomBox.h" compile="0" resource="0" file="Source/CustomBox.h"/>
         <FILE id="qCxTq0" name="CustomSlider.h" compile="0" resource="0" file="Source/CustomSlider.h"/>
         <FILE id="v1Hsiy" name="FmGUI.h" compile="0" resource="0" file="Source/FmGUI.h"/>

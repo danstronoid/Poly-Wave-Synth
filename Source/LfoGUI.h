@@ -13,6 +13,7 @@
 #include "../JuceLibraryCode/JuceHeader.h"
 #include "CustomSlider.h"
 #include "CustomBox.h"
+#include "PercentSlider.h"
 
 //==============================================================================
 /*
@@ -114,7 +115,7 @@ private:
     CustomBox customBox;
 
     Slider rateSlider;
-    Slider depthSlider;
+    PercentSlider depthSlider;
 
     Label rateLabel;
     Label depthLabel; 

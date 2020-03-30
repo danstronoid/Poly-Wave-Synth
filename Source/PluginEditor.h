@@ -12,6 +12,8 @@
 
 #include "../JuceLibraryCode/JuceHeader.h"
 #include "PluginProcessor.h"
+#include "CustomSlider.h"
+#include "DecibelSlider.h"
 #include "AmpEnvGUI.h"
 #include "OscGUI.h"
 #include "FilterGUI.h"
@@ -42,6 +44,11 @@ private:
 
     ColorPalette palette;
     Label title;
+
+    CustomSlider customSlider;
+    DecibelSlider outSlider;
+    Label outLabel;
+    std::unique_ptr<SliderAttachment> outAttach;
 
     AmpEnvGUI ampEnvGUI;
     OscGUI oscGUI;

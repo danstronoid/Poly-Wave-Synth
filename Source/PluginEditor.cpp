@@ -17,12 +17,25 @@ PolyWaveSynthAudioProcessorEditor::PolyWaveSynthAudioProcessorEditor (PolyWaveSy
     : AudioProcessorEditor (&p), processor (p), parameters (vts), 
     ampEnvGUI(vts), oscGUI(vts), filterGUI(vts), filterEnvGUI(vts), fmGUI(vts), lfoGUI(vts)
 {
-    setSize (componentWidth * 3 + padding * 2, componentHeight * 2 + padding * 2);
+    setSize (componentWidth * 3 + padding * 2, componentHeight * 2 + padding * 3);
 
-    title.setText("The Kids' Table", dontSendNotification);
+    // title
+    title.setText("Tiny Table", dontSendNotification);
     title.setFont(Font(40.0f, Font::bold));
+    title.setJustificationType(Justification::centredTop);
     addAndMakeVisible(&title);
 
+    // master output control
+    outSlider.setLookAndFeel(&customSlider);
+    outSlider.setSliderStyle(Slider::LinearHorizontal);
+    outSlider.setTextBoxStyle(Slider::TextBoxLeft, false, 60, 20);
+    addAndMakeVisible(&outSlider);
+    outAttach.reset(new SliderAttachment(parameters, "gain", outSlider));
+    outLabel.setText("Output", dontSendNotification);
+    outLabel.attachToComponent(&outSlider, true);
+    addAndMakeVisible(&outLabel);
+
+    // gui componenets
     addAndMakeVisible(&ampEnvGUI);
     addAndMakeVisible(&oscGUI);
     addAndMakeVisible(&filterGUI);
@@ -55,11 +68,20 @@ void PolyWaveSynthAudioProcessorEditor::paint (Graphics& g)
 void PolyWaveSynthAudioProcessorEditor::resized()
 {
     Rectangle<int> area = getLocalBounds().reduced(padding);
-    title.setBounds(area.removeFromTop(padding));
+
+    // title area
+    //area.removeFromLeft(padding / 2);
+    title.setBounds(area.removeFromLeft(componentWidth).removeFromTop(padding)); 
+    outSlider.setBounds(area.removeFromRight(componentWidth).removeFromTop(padding));
+
+    // top row
+    area = getLocalBounds().reduced(padding);
+    area.removeFromTop(padding);
     oscGUI.setBounds(area.removeFromLeft(componentWidth).removeFromTop(componentHeight));
     ampEnvGUI.setBounds(area.removeFromLeft(componentWidth).removeFromTop(componentHeight));
     fmGUI.setBounds(area.removeFromLeft(componentWidth).removeFromTop(componentHeight));
 
+    // bottom row
     area = getLocalBounds().reduced(padding);
     area.removeFromTop(componentHeight + padding);
     filterGUI.setBounds(area.removeFromLeft(componentWidth).removeFromTop(componentHeight));
