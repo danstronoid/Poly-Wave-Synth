@@ -11,8 +11,7 @@
 #pragma once
 
 #include "../JuceLibraryCode/JuceHeader.h"
-#include "CustomSlider.h"
-#include "CustomBox.h"
+#include "CustomLookAndFeel.h"
 #include "DecibelSlider.h"
 
 typedef AudioProcessorValueTreeState::SliderAttachment SliderAttachment;
@@ -63,21 +62,25 @@ public:
         freqAttach.reset(new SliderAttachment(parameters, "osc_freq", freqSlider));
 
         // Labels
+        oscLabel.setLookAndFeel(&customLabel);
         oscLabel.setText("Osc", dontSendNotification);
         oscLabel.setFont(Font(20.0f, Font::bold));
         oscLabel.setJustificationType(Justification::centred);
         addAndMakeVisible(&oscLabel);
 
+        levelLabel.setLookAndFeel(&customLabel);
         levelLabel.setText("Level", dontSendNotification);
         levelLabel.setJustificationType(Justification::centred);
         addAndMakeVisible(&levelLabel);
         levelLabel.attachToComponent(&levelSlider, false);
 
+        noiseLabel.setLookAndFeel(&customLabel);
         noiseLabel.setText("Noise", dontSendNotification);
         noiseLabel.setJustificationType(Justification::centred);
         addAndMakeVisible(&noiseLabel);
         noiseLabel.attachToComponent(&noiseSlider, false);
 
+        freqLabel.setLookAndFeel(&customLabel);
         freqLabel.setText("Freq", dontSendNotification);
         freqLabel.setJustificationType(Justification::centred);
         addAndMakeVisible(&freqLabel);
@@ -130,6 +133,7 @@ private:
 
     CustomSlider customSlider;
     CustomBox customBox;
+    CustomLabel customLabel;
 
     ComboBox oscType;
     DecibelSlider levelSlider;

@@ -11,8 +11,7 @@
 #pragma once
 
 #include "../JuceLibraryCode/JuceHeader.h"
-#include "CustomSlider.h"
-#include "CustomBox.h"
+#include "CustomLookAndFeel.h"
 #include "PercentSlider.h"
 
 typedef AudioProcessorValueTreeState::SliderAttachment SliderAttachment;
@@ -61,21 +60,25 @@ public:
         filterTypeAttach.reset(new ComboBoxAttachment(parameters, "filter_type", filterType));
 
         // Labels
+        cutoffLabel.setLookAndFeel(&customLabel);
         cutoffLabel.setText("Cutoff", dontSendNotification);
         cutoffLabel.setJustificationType(Justification::centred);
         addAndMakeVisible(&cutoffLabel);
         cutoffLabel.attachToComponent(&cutoffSlider, false);
 
+        qLabel.setLookAndFeel(&customLabel);
         qLabel.setText("Q", dontSendNotification);
         qLabel.setJustificationType(Justification::centred);
         addAndMakeVisible(&qLabel);
         qLabel.attachToComponent(&qSlider, false);
 
+        envAmtLabel.setLookAndFeel(&customLabel);
         envAmtLabel.setText("Env", dontSendNotification);
         envAmtLabel.setJustificationType(Justification::centred);
         addAndMakeVisible(&envAmtLabel);
         envAmtLabel.attachToComponent(&envAmtSlider, false);
 
+        filterLabel.setLookAndFeel(&customLabel);
         filterLabel.setText("Filter", dontSendNotification);
         filterLabel.setFont(Font(20.0f, Font::bold));
         filterLabel.setJustificationType(Justification::centred);
@@ -130,6 +133,7 @@ private:
 
     CustomSlider customSlider;
     CustomBox customBox;
+    CustomLabel customLabel;
 
     Slider cutoffSlider;
     Slider qSlider;

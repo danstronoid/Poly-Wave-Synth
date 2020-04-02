@@ -10,7 +10,6 @@
 
 #include "PluginProcessor.h"
 #include "PluginEditor.h"
-#include "ColorPalette.h"
 
 //==============================================================================
 PolyWaveSynthAudioProcessorEditor::PolyWaveSynthAudioProcessorEditor (PolyWaveSynthAudioProcessor& p, AudioProcessorValueTreeState& vts)
@@ -31,6 +30,8 @@ PolyWaveSynthAudioProcessorEditor::PolyWaveSynthAudioProcessorEditor (PolyWaveSy
     outSlider.setTextBoxStyle(Slider::TextBoxLeft, false, 60, 20);
     addAndMakeVisible(&outSlider);
     outAttach.reset(new SliderAttachment(parameters, "gain", outSlider));
+
+    outLabel.setLookAndFeel(&customLabel);
     outLabel.setText("Output", dontSendNotification);
     outLabel.attachToComponent(&outSlider, true);
     addAndMakeVisible(&outLabel);

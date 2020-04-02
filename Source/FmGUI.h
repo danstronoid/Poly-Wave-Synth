@@ -11,8 +11,7 @@
 #pragma once
 
 #include "../JuceLibraryCode/JuceHeader.h"
-#include "CustomSlider.h"
-#include "CustomBox.h"
+#include "CustomLookAndFeel.h"
 #include "PercentSlider.h"
 
 typedef AudioProcessorValueTreeState::SliderAttachment SliderAttachment;
@@ -64,21 +63,25 @@ public:
         depthAttach.reset(new SliderAttachment(parameters, "fm_depth", depthSlider));
 
         // Labels
+        fmLabel.setLookAndFeel(&customLabel);
         fmLabel.setText("FM", dontSendNotification);
         fmLabel.setFont(Font(20.0f, Font::bold));
         fmLabel.setJustificationType(Justification::centred);
         addAndMakeVisible(&fmLabel);
 
+        multiLabel.setLookAndFeel(&customLabel);
         multiLabel.setText("Multi", dontSendNotification);
         multiLabel.setJustificationType(Justification::centred);
         addAndMakeVisible(&multiLabel);
         multiLabel.attachToComponent(&multiSlider, false);
 
+        freqLabel.setLookAndFeel(&customLabel);
         freqLabel.setText("Freq", dontSendNotification);
         freqLabel.setJustificationType(Justification::centred);
         addAndMakeVisible(&freqLabel);
         freqLabel.attachToComponent(&freqSlider, false);
 
+        depthLabel.setLookAndFeel(&customLabel);
         depthLabel.setText("Depth", dontSendNotification);
         depthLabel.setJustificationType(Justification::centred);
         addAndMakeVisible(&depthLabel);
@@ -129,6 +132,7 @@ private:
 
     CustomSlider customSlider;
     CustomBox customBox;
+    CustomLabel customLabel;
 
     Slider multiSlider;
     PercentSlider depthSlider;

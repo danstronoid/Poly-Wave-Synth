@@ -11,8 +11,7 @@
 #pragma once
 
 #include "../JuceLibraryCode/JuceHeader.h"
-#include "CustomSlider.h"
-#include "CustomBox.h"
+#include "CustomLookAndFeel.h"
 #include "PercentSlider.h"
 
 typedef AudioProcessorValueTreeState::ButtonAttachment ButtonAttachment;
@@ -55,22 +54,25 @@ public:
         depthAttach.reset(new SliderAttachment(parameters, "lfo_depth", depthSlider));
 
         // Buttons
+        triggerButton.setLookAndFeel(&customButton);
         triggerButton.setButtonText("Trigger");
-        //triggerButton.setClickingTogglesState(true);
         addAndMakeVisible(&triggerButton);
         triggerAttach.reset(new ButtonAttachment(parameters, "lfo_trigger", triggerButton));
 
         // Labels
+        lfoLabel.setLookAndFeel(&customLabel);
         lfoLabel.setText("LFO", dontSendNotification);
         lfoLabel.setFont(Font(20.0f, Font::bold));
         lfoLabel.setJustificationType(Justification::centred);
         addAndMakeVisible(&lfoLabel);
 
+        rateLabel.setLookAndFeel(&customLabel);
         rateLabel.setText("Rate", dontSendNotification);
         rateLabel.setJustificationType(Justification::centred);
         addAndMakeVisible(&rateLabel);
         rateLabel.attachToComponent(&rateSlider, false);
 
+        depthLabel.setLookAndFeel(&customLabel);
         depthLabel.setText("Depth", dontSendNotification);
         depthLabel.setJustificationType(Justification::centred);
         addAndMakeVisible(&depthLabel);
@@ -118,10 +120,12 @@ public:
 private:
     AudioProcessorValueTreeState& parameters;
 
-    ComboBox lfoType;
-
     CustomSlider customSlider;
     CustomBox customBox;
+    CustomLabel customLabel;
+    CustomButton customButton;
+
+    ComboBox lfoType;
 
     Slider rateSlider;
     PercentSlider depthSlider;

@@ -12,7 +12,7 @@
 
 #include "../JuceLibraryCode/JuceHeader.h"
 #include "PluginProcessor.h"
-#include "CustomSlider.h"
+#include "CustomLookAndFeel.h"
 #include "DecibelSlider.h"
 #include "AmpEnvGUI.h"
 #include "OscGUI.h"
@@ -43,11 +43,15 @@ private:
     AudioProcessorValueTreeState& parameters;
 
     ColorPalette palette;
-    Label title;
 
     CustomSlider customSlider;
+    CustomLabel customLabel;
+
     DecibelSlider outSlider;
+
     Label outLabel;
+    Label title;
+
     std::unique_ptr<SliderAttachment> outAttach;
 
     AmpEnvGUI ampEnvGUI;

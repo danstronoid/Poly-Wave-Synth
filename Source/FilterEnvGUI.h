@@ -11,7 +11,8 @@
 #pragma once
 
 #include "../JuceLibraryCode/JuceHeader.h"
-#include "CustomSlider.h"
+#include "CustomLookAndFeel.h"
+
 typedef AudioProcessorValueTreeState::SliderAttachment SliderAttachment;
 
 //==============================================================================
@@ -55,21 +56,25 @@ public:
         releaseAttach.reset(new SliderAttachment(parameters, "filterEnv_release", releaseSlider));
 
         // Labels
+        attackLabel.setLookAndFeel(&customLabel);
         attackLabel.setText("A", dontSendNotification);
         attackLabel.setJustificationType(Justification::centred);
         addAndMakeVisible(&attackLabel);
         attackLabel.attachToComponent(&attackSlider, false);
 
+        decayLabel.setLookAndFeel(&customLabel);
         decayLabel.setText("D", dontSendNotification);
         decayLabel.setJustificationType(Justification::centred);
         addAndMakeVisible(&decayLabel);
         decayLabel.attachToComponent(&decaySlider, false);
 
+        sustainLabel.setLookAndFeel(&customLabel);
         sustainLabel.setText("S", dontSendNotification);
         sustainLabel.setJustificationType(Justification::centred);
         addAndMakeVisible(&sustainLabel);
         sustainLabel.attachToComponent(&sustainSlider, false);
 
+        releaseLabel.setLookAndFeel(&customLabel);
         releaseLabel.setText("R", dontSendNotification);
         releaseLabel.setJustificationType(Justification::centred);
         addAndMakeVisible(&releaseLabel);
@@ -109,6 +114,7 @@ private:
     AudioProcessorValueTreeState& parameters;
 
     CustomSlider customSlider;
+    CustomLabel customLabel;
 
     Slider attackSlider;
     Slider decaySlider;
