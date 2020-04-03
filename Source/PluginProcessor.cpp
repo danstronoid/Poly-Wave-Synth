@@ -150,7 +150,8 @@ void PolyWaveSynthAudioProcessor::processBlock (AudioBuffer<float>& buffer, Midi
 		buffer.applyGainRamp(0, buffer.getNumSamples(), previousGain, currentGain);
 		previousGain = currentGain;
 	}
-	
+
+    meter = buffer.getMagnitude(0, buffer.getNumSamples());
 }
 
 //==============================================================================

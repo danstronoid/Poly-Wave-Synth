@@ -14,9 +14,6 @@
 //==============================================================================
 LevelMeter::LevelMeter()
 {
-    // In your constructor, you should add any child components, and
-    // initialise any special settings that your component needs.
-
 }
 
 LevelMeter::~LevelMeter()
@@ -25,27 +22,97 @@ LevelMeter::~LevelMeter()
 
 void LevelMeter::paint (Graphics& g)
 {
-    /* This demo code just fills the component's background and
-       draws some placeholder text to get you started.
+    Rectangle<float> area = g.getClipBounds().toFloat();
+    Rectangle<float> peakArea;
 
-       You should replace everything in this method with your own
-       drawing code..
-    */
+    Path pFill;
+    Path pBG;
 
-    g.fillAll (getLookAndFeel().findColour (ResizableWindow::backgroundColourId));   // clear the background
+    Point<float> minLevel;
+    Point<float> maxLevel;
+    Point<float> level;
+    Point<float> peakLevel;
 
-    g.setColour (Colours::grey);
-    g.drawRect (getLocalBounds(), 1);   // draw an outline around the component
+    float strokeWidth = 12.0f;
+    float peakSize = 6.0f;
 
-    g.setColour (Colours::white);
-    g.setFont (14.0f);
-    g.drawText ("LevelMeter", getLocalBounds(),
-                Justification::centred, true);   // draw some placeholder text
+    //use a vertical meter if the height is greater than the width
+    if (area.getHeight() >= area.getWidth())
+    {
+        if (m_fillArea)
+            strokeWidth = area.getWidth();
+
+        float xPos = area.getX() + area.getWidth() / 2;
+        peakArea.setSize(strokeWidth, peakSize);
+
+        minLevel.setXY(xPos, area.getHeight());
+        maxLevel.setXY(xPos, area.getY());
+
+        level.setXY(xPos, jmin<float>(area.getHeight() * (1 - m_level), area.getY()));
+
+        peakLevel.setXY(xPos, jlimit<float>(area.getHeight() - peakSize / 2, 
+            area.getY() + peakSize / 2, area.getHeight() * (1 - m_peak)));
+    }
+    else // otherwise use a horizontal meter
+    {
+        if (m_fillArea)
+            strokeWidth = area.getHeight();
+
+        float yPos = area.getY() + area.getHeight() / 2;
+        peakArea.setSize(peakSize, strokeWidth);
+
+        minLevel.setXY(area.getX(), yPos);
+        maxLevel.setXY(area.getWidth(), yPos);
+
+        level.setXY(jmin<float>(area.getWidth() * m_level, area.getWidth()), yPos);
+
+        peakLevel.setXY(jlimit<float>(peakSize / 2, area.getWidth() - peakSize / 2, 
+            area.getWidth() * m_peak), yPos);
+    }
+
+    // set paths
+    PathStrokeType stroke(strokeWidth, PathStrokeType::beveled, PathStrokeType::butt);
+    pBG.startNewSubPath(minLevel);
+    pBG.lineTo(maxLevel);
+    pFill.startNewSubPath(minLevel);
+    pFill.lineTo(level);
+
+    // draw background
+    g.setColour(m_bgColor);
+    g.strokePath(pBG, stroke);
+
+    // draw level
+    g.setColour(m_fillColor);
+    g.strokePath(pFill, stroke);
+
+    // draw peak
+    if (m_peak >= 1.0f)
+        g.setColour(Colours::red);
+    else
+        g.setColour(m_peakColor);
+
+    g.fillRect(peakArea.withCentre(peakLevel));
 }
 
-void LevelMeter::resized()
+void LevelMeter::update(float level)
 {
-    // This method is where you should set the bounds of any child
-    // components that your component contains..
+    // set the peak level
+    if (level > m_peak)
+        m_peak = level;
 
+    // update the level
+    if (level > m_level)
+        m_level = level;
+    else if (level > 0.00001)
+        m_level *= 0.95f;
+    else
+        m_level = 0.0f;
+
+    // reset the peak every second
+    if (++m_counter == 30)
+    {
+        m_peak = m_level;
+        m_counter = 0;
+    }
 }
+

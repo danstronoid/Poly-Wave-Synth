@@ -128,11 +128,11 @@ public:
 private:
     AudioProcessorValueTreeState& parameters;
 
-    ComboBox oscType;
-
     CustomSlider customSlider;
     CustomBox customBox;
     CustomLabel customLabel;
+
+    ComboBox oscType;
 
     Slider multiSlider;
     PercentSlider depthSlider;

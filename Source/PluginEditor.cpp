@@ -17,6 +17,7 @@ PolyWaveSynthAudioProcessorEditor::PolyWaveSynthAudioProcessorEditor (PolyWaveSy
     ampEnvGUI(vts), oscGUI(vts), filterGUI(vts), filterEnvGUI(vts), fmGUI(vts), lfoGUI(vts)
 {
     setSize (componentWidth * 3 + padding * 2, componentHeight * 2 + padding * 3);
+    Timer::startTimerHz(30);
 
     // title
     title.setText("Tiny Table", dontSendNotification);
@@ -37,6 +38,8 @@ PolyWaveSynthAudioProcessorEditor::PolyWaveSynthAudioProcessorEditor (PolyWaveSy
     addAndMakeVisible(&outLabel);
 
     // gui componenets
+    addAndMakeVisible(&meter);
+
     addAndMakeVisible(&ampEnvGUI);
     addAndMakeVisible(&oscGUI);
     addAndMakeVisible(&filterGUI);
@@ -47,6 +50,13 @@ PolyWaveSynthAudioProcessorEditor::PolyWaveSynthAudioProcessorEditor (PolyWaveSy
 
 PolyWaveSynthAudioProcessorEditor::~PolyWaveSynthAudioProcessorEditor()
 {
+    Timer::stopTimer();
+}
+
+void PolyWaveSynthAudioProcessorEditor::timerCallback()
+{
+    meter.update(processor.getMeterValue());
+    meter.repaint();
 }
 
 //==============================================================================
@@ -71,9 +81,13 @@ void PolyWaveSynthAudioProcessorEditor::resized()
     Rectangle<int> area = getLocalBounds().reduced(padding);
 
     // title area
-    //area.removeFromLeft(padding / 2);
     title.setBounds(area.removeFromLeft(componentWidth).removeFromTop(padding)); 
     outSlider.setBounds(area.removeFromRight(componentWidth).removeFromTop(padding));
+
+    // meter area
+    area = getLocalBounds();
+    area.reduce(padding, padding / 2);
+    meter.setBounds(area.removeFromRight(componentWidth).removeFromTop(padding / 2));
 
     // top row
     area = getLocalBounds().reduced(padding);

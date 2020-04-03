@@ -82,12 +82,16 @@ public:
     // initialze all parameters
     void initParameters();
 
+    float getMeterValue() { return meter; };
+
 private:
 	AudioProcessorValueTreeState parameters;
 	WaveSynthEngine synthEngine;
 
 	float currentGain{ 1.0f };
 	float previousGain{ 1.0f };
+
+    float meter{ 0.0f };
 
     //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (PolyWaveSynthAudioProcessor)

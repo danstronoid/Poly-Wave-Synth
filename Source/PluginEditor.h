@@ -14,6 +14,9 @@
 #include "PluginProcessor.h"
 #include "CustomLookAndFeel.h"
 #include "DecibelSlider.h"
+
+#include "LevelMeter.h"
+
 #include "AmpEnvGUI.h"
 #include "OscGUI.h"
 #include "FilterGUI.h"
@@ -26,7 +29,8 @@ typedef AudioProcessorValueTreeState::SliderAttachment SliderAttachment;
 //==============================================================================
 /**
 */
-class PolyWaveSynthAudioProcessorEditor  : public AudioProcessorEditor
+class PolyWaveSynthAudioProcessorEditor  : public AudioProcessorEditor,
+                                           public Timer
 {
 public:
     PolyWaveSynthAudioProcessorEditor (PolyWaveSynthAudioProcessor&, AudioProcessorValueTreeState&);
@@ -35,6 +39,7 @@ public:
     //==============================================================================
     void paint (Graphics&) override;
     void resized() override;
+    void timerCallback() override;
 
 private:
     // This reference is provided as a quick way for your editor to
@@ -53,6 +58,8 @@ private:
     Label title;
 
     std::unique_ptr<SliderAttachment> outAttach;
+
+    LevelMeter meter;
 
     AmpEnvGUI ampEnvGUI;
     OscGUI oscGUI;
