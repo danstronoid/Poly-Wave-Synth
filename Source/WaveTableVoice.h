@@ -53,6 +53,10 @@ struct WaveTableVoice : public SynthesiserVoice {
 
 	// a control buffer
 	AudioBuffer<float>& m_lfoBuffer;
+
+	// a buffer to hold the tail incase the voice is stolen
+	AudioBuffer<float> m_tailBuffer;
+	int m_tailIndex{ -1 };
 };
 
 //==============================================================================

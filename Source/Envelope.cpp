@@ -76,8 +76,8 @@ void Envelope::updateRates()
 {
 	m_susLevel = m_susTarget;
 
-	m_attackRate = static_cast<float>(1.0f / (m_attackTime * m_sampleRate));
-	m_decayRate = static_cast<float>((1.0f - m_susLevel) / (m_decayTime * m_sampleRate));
+	m_attackRate = static_cast<float>(1.0 / (m_attackTime * m_sampleRate));
+	m_decayRate = static_cast<float>((1.0 - m_susLevel) / (m_decayTime * m_sampleRate));
 	m_releaseRate = static_cast<float>(m_susLevel / (m_releaseTime * m_sampleRate));
 
 	reset();
@@ -90,9 +90,14 @@ void Envelope::noteOn()
 	m_envValue = 0;
 }
 
-void Envelope::noteOff()
+void Envelope::noteOff(bool allowTailOff)
 {
-	if (currentState != State::sustain)
+	if (!allowTailOff)
+	{
+		m_releaseRate = static_cast<float> (m_envValue / (m_fastReleaseTime * m_sampleRate));
+		m_fastRelease = true;
+	}
+	else if (currentState != State::sustain)
 	{
 		m_releaseRate = static_cast<float> (m_envValue / (m_releaseTime * m_sampleRate));
 		m_fastRelease = true;

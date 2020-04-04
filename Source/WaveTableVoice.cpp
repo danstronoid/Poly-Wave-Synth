@@ -20,6 +20,12 @@ WaveTableVoice::WaveTableVoice(const WaveTableGenerator& tableGenerator,
 	m_svf.setSampleRate(getSampleRate());
 	m_ampADSR.setSampleRate(getSampleRate());
 	m_filterADSR.setSampleRate(getSampleRate());
+
+	// initialize the buffer to hold the tail
+	// a stolen voice will trigger a fast release time of 0.01s 
+	// the buffer should hold enought samples to accomodate this
+	m_tailBuffer.setSize(1, roundToInt(0.01 * getSampleRate()));
+	m_tailBuffer.clear();
 }
 
 bool WaveTableVoice::isVoiceActive() const
@@ -46,6 +52,8 @@ void WaveTableVoice::startNote(int midiNoteNumber, float velocity, SynthesiserSo
 
 void WaveTableVoice::stopNote(float /*velocity*/, bool allowTailOff)
 {
+	//m_ampADSR.noteOff(allowTailOff);
+	//m_filterADSR.noteOff(allowTailOff);
 	if (allowTailOff)
 	{
 		m_ampADSR.noteOff();
@@ -53,6 +61,15 @@ void WaveTableVoice::stopNote(float /*velocity*/, bool allowTailOff)
 	}
 	else
 	{
+		// render the tail to the tail buffer
+		m_ampADSR.noteOff(allowTailOff);
+		m_filterADSR.noteOff(allowTailOff);
+
+		m_tailIndex = -1;
+		m_tailBuffer.clear();
+		renderNextBlock(m_tailBuffer, 0, m_tailBuffer.getNumSamples());
+		m_tailIndex = 0;
+
 		m_ampADSR.reset();
 		m_filterADSR.reset();
 		clearCurrentNote();
@@ -94,9 +111,20 @@ void WaveTableVoice::renderNextBlock(AudioBuffer<float>& outputBuffer, int start
 			m_svf.update(filterEnvValue, lfoValue);
 			currentSample = m_svf.renderSample(currentSample + noise);
 
+			// if a tail was rendered to the buffer, add it to the output
+			float tailSample = 0;
+			if (m_tailIndex > -1)
+			{
+				tailSample = m_tailBuffer.getSample(0, m_tailIndex);
+				++m_tailIndex;
+
+				if (m_tailIndex == m_tailBuffer.getNumSamples())
+					m_tailIndex = -1;
+			}
+
 			// apply the ampEnv to the sample and add it to the output buffer
 			for (auto channel = outputBuffer.getNumChannels(); --channel >= 0;)
-				outputBuffer.addSample(channel, startSample, currentSample * ampEnvValue);
+				outputBuffer.addSample(channel, startSample, currentSample * ampEnvValue + tailSample);
 
 			++startSample;
 		}

@@ -13,7 +13,7 @@
 #include "../JuceLibraryCode/JuceHeader.h"
 #include "PluginProcessor.h"
 #include "CustomLookAndFeel.h"
-#include "DecibelSlider.h"
+#include "CustomSliderTypes.h"
 
 #include "LevelMeter.h"
 
@@ -52,14 +52,13 @@ private:
     CustomSlider customSlider;
     CustomLabel customLabel;
 
+    LevelMeter meter;
     DecibelSlider outSlider;
 
     Label outLabel;
     Label title;
 
     std::unique_ptr<SliderAttachment> outAttach;
-
-    LevelMeter meter;
 
     AmpEnvGUI ampEnvGUI;
     OscGUI oscGUI;

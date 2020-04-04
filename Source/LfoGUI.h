@@ -12,7 +12,7 @@
 
 #include "../JuceLibraryCode/JuceHeader.h"
 #include "CustomLookAndFeel.h"
-#include "PercentSlider.h"
+#include "CustomSliderTypes.h"
 
 typedef AudioProcessorValueTreeState::ButtonAttachment ButtonAttachment;
 

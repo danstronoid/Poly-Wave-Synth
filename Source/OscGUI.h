@@ -12,7 +12,7 @@
 
 #include "../JuceLibraryCode/JuceHeader.h"
 #include "CustomLookAndFeel.h"
-#include "DecibelSlider.h"
+#include "CustomSliderTypes.h"
 
 typedef AudioProcessorValueTreeState::SliderAttachment SliderAttachment;
 typedef AudioProcessorValueTreeState::ComboBoxAttachment ComboBoxAttachment;
@@ -56,7 +56,6 @@ public:
         
         freqSlider.setSliderStyle(Slider::RotaryHorizontalVerticalDrag);
         freqSlider.setTextBoxStyle(Slider::TextBoxBelow, false, 60, 20);
-        freqSlider.setTextValueSuffix(" Hz");
         //freqSlider.setPopupDisplayEnabled(true, false, this);
         addAndMakeVisible(&freqSlider);
         freqAttach.reset(new SliderAttachment(parameters, "osc_freq", freqSlider));
@@ -138,7 +137,7 @@ private:
     ComboBox oscType;
     DecibelSlider levelSlider;
     DecibelSlider noiseSlider;
-    Slider freqSlider;
+    OscFreqSlider freqSlider;
 
     Label oscLabel;
     Label levelLabel;

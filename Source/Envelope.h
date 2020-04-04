@@ -23,7 +23,7 @@ public:
 	void updateRates();
 
 	void noteOn();
-	void noteOff();
+	void noteOff(bool allowTailOff = true);
 
 	bool isActive() const;
 	void reset();
@@ -45,4 +45,7 @@ private:
 	float m_decayTime{ 0.0f };
 	float m_releaseTime{ 0.0f };
 	float m_susTarget{ 0.0f };
+
+	// this is a very fast release time to ease a hard stop
+	const float m_fastReleaseTime{ 0.01f };
 };
