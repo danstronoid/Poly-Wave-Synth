@@ -5,6 +5,8 @@
     Created: 17 Feb 2020 6:52:32pm
     Author:  Daniel Schwartz
 
+	This is a linear ADSR envelope class based on the JUCE ADSR.
+
   ==============================================================================
 */
 
@@ -12,11 +14,13 @@
 
 Envelope::Envelope() {}
 
+// the sample rate must be set before processing the envelope
 void Envelope::setSampleRate(double sampleRate)
 {
 	m_sampleRate = sampleRate;
 }
 
+// set attack time, decay time, sustain level, and release time
 void Envelope::setParameters(float attack, float decay, float sus, float release)
 {
 	m_susTarget = sus;
@@ -25,6 +29,7 @@ void Envelope::setParameters(float attack, float decay, float sus, float release
 	m_releaseTime = release;
 }
 
+// processes one sample of the envelope, updates the envValue and the currentState
 float Envelope::getNextSample()
 {
 	switch (currentState)
@@ -72,6 +77,8 @@ float Envelope::getNextSample()
 	return m_envValue;
 }
 
+// calculates rates based on the times provided by setParameters
+// this is called in noteOn
 void Envelope::updateRates()
 {
 	m_susLevel = m_susTarget;
@@ -83,6 +90,7 @@ void Envelope::updateRates()
 	reset();
 }
 
+// trigger the attack state
 void Envelope::noteOn()
 {
 	updateRates();
@@ -90,6 +98,9 @@ void Envelope::noteOn()
 	m_envValue = 0;
 }
 
+// trigger the release state
+// if allowTailOff is false, then the release rate is set using a fast release time
+// allowTailOff will be false when a voice is stolen
 void Envelope::noteOff(bool allowTailOff)
 {
 	if (!allowTailOff)
@@ -105,11 +116,13 @@ void Envelope::noteOff(bool allowTailOff)
 	currentState = State::release;
 }
 
+// checks if the envelope is in its idle state
 bool Envelope::isActive() const
 {
 	return currentState != State::idle;
 }
 
+// resets the envelope state and value
 void Envelope::reset()
 {
 	m_envValue = 0;

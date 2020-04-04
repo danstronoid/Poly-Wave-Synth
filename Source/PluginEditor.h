@@ -5,18 +5,26 @@
 
     It contains the basic framework code for a JUCE plugin editor.
 
+    Tiny Table
+    Author:  Daniel Schwartz
+
+    Tiny Table is a simple wave table synthesizer.  Each voice has 2 oscillators,
+    2 ADSR envelopes, and one filter.  There is also a single LFO which controls
+    the cutoff frequency of all of the filters.  There are a total of 12 voices.
+
   ==============================================================================
 */
 
 #pragma once
 
 #include "../JuceLibraryCode/JuceHeader.h"
+
 #include "PluginProcessor.h"
 #include "CustomLookAndFeel.h"
 #include "CustomSliderTypes.h"
-
 #include "LevelMeter.h"
 
+// all of the GUI components to place in the editor window
 #include "AmpEnvGUI.h"
 #include "OscGUI.h"
 #include "FilterGUI.h"

@@ -5,6 +5,9 @@
     Created: 23 Feb 2020 1:56:21pm
     Author:  Daniel Schwartz
 
+    This creates the layout and functionality for the LFO GUI
+    componenet.
+
   ==============================================================================
 */
 

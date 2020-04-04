@@ -5,6 +5,10 @@
     Created: 2 Apr 2020 10:45:04am
     Author:  Daniel Schwartz
 
+    This draws a simple Level Meter.  This class doesn't have a timer, but rather
+    the update and repaint functions should be called in the pluginEditor using
+    a timerCallback.
+
   ==============================================================================
 */
 

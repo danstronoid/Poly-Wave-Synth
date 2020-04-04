@@ -5,6 +5,13 @@
     Created: 22 Feb 2020 1:38:05pm
     Author:  Daniel Schwartz
 
+    This osciallator class uses wavetables created by the WaveTableGenerator class.
+    The WaveTableGenerator is passed by reference so that each oscillator doesn't need
+    it's own copy.
+
+    This osc can be used with noteOn() for midi input, or as a fixed frequency oscillator 
+    with setParameters().
+
   ==============================================================================
 */
 
@@ -13,17 +20,18 @@
 #include "../JuceLibraryCode/JuceHeader.h"
 #include "WaveTableGenerator.h"
 
-// this can be used with noteOn() for midi input, 
-// or as a static oscillator with setParameters() 
 class Oscillator
 {
 public:
+    // the oscillator class needs a reference to the tables created by
+    // WaveTableGenerator
     Oscillator(const WaveTableGenerator& tableGenerator) :
         m_tables(tableGenerator)
     {
         m_tableSize = m_tables.getTableSize();
     }
 
+    // the sample rate must be set before processing
     void setSampleRate(double sampleRate)
     {
         m_sampleRate = sampleRate;
@@ -35,7 +43,12 @@ public:
         m_waveType = type;
     }
 
-    void setParameters(float freq, float oscLevel = 0.3, float multi = 1, bool fixedFreq = false, bool initLvl = false)
+    // this method is used to set the oscillator using a fixed frequency
+    // if fixedFreq is false, the provided frequency will be ignored
+    // the overall level of the osc can be set using oscLevel
+    // use the initLvl bool to initialize output of a fixed osc
+    void setParameters(float freq, float oscLevel = 0.3, float multi = 1, 
+        bool fixedFreq = false, bool initLvl = false)
     {
         m_multi = multi;
         m_oscLevel = oscLevel;
@@ -49,26 +62,29 @@ public:
             m_level = m_oscLevel;    
     }
 
+    // calculates the delta given a modulation index, use this with a fixed osc
     void calculateDelta(float mod = 0)
     {
         m_tableDelta = fmax(0.0f, m_freq + mod * m_freq) * m_sizeOverSR;
     }
 
-
+    // set the osc using a midi note on message
     void noteOn(int midiNoteNumber, float velocity)
     {
         m_tablePos = 0;
         m_level = velocity * m_oscLevel;
 
-        // need to alter this so that the octave is calculated from the frequency 
+        // calculates the octave from the midi note, this is used for a different bandlimited table per octave
         m_octave = midiNoteNumber / 12 - 1;
 
+        // if this is a fixed osc, then we ignore the midi note number
         if (!m_fixedFreq)
             m_freq = static_cast<float>(MidiMessage::getMidiNoteInHertz(midiNoteNumber));
 
         m_tableDelta = (m_freq * m_multi) * m_sizeOverSR;
     }
 
+    // this calculates the next sample using simple linear interpolation
     forcedinline float getNextSample() noexcept
     {
         int index0 = static_cast<int>(m_tablePos);
@@ -89,17 +105,20 @@ public:
         return currentSample * m_level;
     }
 
+    // reset the table position only
     void resetPos()
     {
         m_tablePos = 0;
     }
 
+    // reset table position and delta
     void reset()
     {
         m_tablePos = 0;
         m_tableDelta = 0;
     }
 
+    // if delta is 0, the osc isn't active
     bool isActive()
     {
         return m_tableDelta != 0;

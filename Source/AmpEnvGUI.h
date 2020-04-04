@@ -5,6 +5,9 @@
     Created: 18 Feb 2020 3:04:39pm
     Author:  Daniel Schwartz
 
+    This creates the layout and functionality for the Amplitude Envelope GUI
+    componenet.
+
   ==============================================================================
 */
 

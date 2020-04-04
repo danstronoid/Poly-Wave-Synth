@@ -5,6 +5,16 @@
     Created: 31 Mar 2020 8:06:23am
     Author:  Daniel Schwartz
 
+    This file defines custom look and feel classes for several components
+    including (in order of apperance): slider, combobox, label, and togglebutton.
+
+    This also defines a struct for a color palette which can be used to set colors
+    throughout the application.  I found this to be a simpler way to do this than
+    using the JUCE colour palette objects.
+
+    This could be split into multiple files down the line, 
+    but I kept everything in the same file for my convenience.
+
   ==============================================================================
 */
 
@@ -252,6 +262,55 @@ public:
         setColour(ToggleButton::textColourId, palette.textBright);
         setColour(ToggleButton::tickColourId, palette.accent);
         setColour(ToggleButton::tickDisabledColourId, palette.background);
+    }
+
+    // This override is taken directly from the LookAndFeel_V4 implementation so that a custom tickbox can be used
+    void drawToggleButton(Graphics& g, ToggleButton& button, 
+        bool shouldDrawButtonAsHighlighted, bool shouldDrawButtonAsDown) override
+    {
+        auto fontSize = jmin(15.0f, button.getHeight() * 0.75f);
+        auto tickWidth = fontSize * 1.1f;
+
+        drawTickBox(g, button, 4.0f, (button.getHeight() - tickWidth) * 0.5f,
+            tickWidth, tickWidth,
+            button.getToggleState(),
+            button.isEnabled(),
+            shouldDrawButtonAsHighlighted,
+            shouldDrawButtonAsDown);
+
+        g.setColour(button.findColour(ToggleButton::textColourId));
+        g.setFont(fontSize);
+
+        if (!button.isEnabled())
+            g.setOpacity(0.5f);
+
+        g.drawFittedText(button.getButtonText(),
+            button.getLocalBounds().withTrimmedLeft(roundToInt(tickWidth) + 10)
+            .withTrimmedRight(2),
+            Justification::centredLeft, 10);
+    }
+
+    // this is taken from LookAndFeel_V4 but modified for a non-rounded box
+    void drawTickBox(Graphics& g, Component& component,
+        float x, float y, float w, float h,
+        const bool ticked,
+        const bool isEnabled,
+        const bool shouldDrawButtonAsHighlighted,
+        const bool shouldDrawButtonAsDown) override
+    {
+        ignoreUnused(isEnabled, shouldDrawButtonAsHighlighted, shouldDrawButtonAsDown);
+
+        Rectangle<float> tickBounds(x, y, w, h);
+
+        g.setColour(component.findColour(ToggleButton::tickDisabledColourId));
+        g.drawRect(tickBounds, 2.0f);
+
+        if (ticked)
+        {
+            g.setColour(component.findColour(ToggleButton::tickColourId));
+            auto tick = getTickShape(0.75f);
+            g.fillPath(tick, tick.getTransformToScaleToFit(tickBounds.reduced(4, 5).toFloat(), false));
+        }
     }
 
 private:

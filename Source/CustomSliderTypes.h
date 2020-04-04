@@ -5,11 +5,19 @@
     Created: 3 Apr 2020 3:00:01pm
     Author:  Daniel Schwartz
 
+	This file defines a couple of custom slider implementations to override the
+	ValueFromText and TextFromValue functions.  
+
   ==============================================================================
 */
 
 #pragma once
 #include "../JuceLibraryCode/JuceHeader.h"
+
+
+//============================================================================== 
+
+// use this type of slider to display values in dB scale
 
 class DecibelSlider : public Slider
 {
@@ -44,6 +52,10 @@ private:
 	double m_minusInfdB;
 };
 
+//============================================================================== 
+
+// use this slider to display values as a percentage
+
 class PercentSlider : public Slider
 {
 public:
@@ -61,6 +73,13 @@ public:
 		return String(percValue) + "%";
 	}
 };
+
+//============================================================================== 
+
+// use this slider to display the frequency of a fixed osclillator
+// the advantage of using this instead of just changing the suffix 
+// is that it shows "20 Hz" as being "Off" which is true for the way fixed Oscillators 
+// are implemented in this synth.
 
 class OscFreqSlider : public Slider
 {

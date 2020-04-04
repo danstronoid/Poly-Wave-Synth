@@ -5,7 +5,7 @@
     Created: 19 Feb 2020 9:52:28am
     Author:  Daniel Schwartz
 
-    This is an implementation in the algorithm described by the technical paper
+    This is an implementation of the algorithm described by the technical paper
     https://cytomic.com/files/dsp/SvfLinearTrapOptimised2.pdf by Andrew Simper
 
   ==============================================================================
@@ -21,6 +21,7 @@ class StateVariableFilter
 public:
     StateVariableFilter() {}
 
+    // the sample rate must be set before processing
     void setSampleRate(double sampleRate)
     {
         m_sampleRate = sampleRate;
@@ -36,12 +37,15 @@ public:
         calculateCoef();
     }
 
+    // this update function can be call with an envelope value or an osc mod value 
+    // modulating the cutoff with the provided values
     void update(double env = 1, double mod = 0)
     {
         m_cutoff = fmin(19000, fmax(40, m_targetCutoff * env + mod * m_targetCutoff / 2));
         calculateCoef();
     }
 
+    // renders the filter on a single sample and returns the filtered sample value
     inline float renderSample(float v0)
     {
         m_v3 = v0 - m_ic2eq;
@@ -53,6 +57,7 @@ public:
         return static_cast<float>(m_m0 * v0 + m_m1 * m_v1 + m_m2 * m_v2);
     }
 
+    // optional function to render samples as a block instead of returning a single sample
     inline void renderBlock(float* samples, const int numSamples)
     {
         for (int i = 0; i < numSamples; ++i)
@@ -71,6 +76,8 @@ private:
     double m_cutoff{};
     double m_q{};
 
+    // the target cutoff is the central cutoff of the filter
+    // the m_cutoff can be modulated around this center
     double m_targetCutoff{};
 
     double m_ic1eq{ 0 };
@@ -87,6 +94,8 @@ private:
     double m_m1{ 0 };
     double m_m2{ 0 };
 
+    // this private member function calculates all of the coefficients to be used 
+    // in render sample, this is called when a parameter is changed
     void calculateCoef()
     {
         double g = std::tan(MathConstants<double>::pi * m_cutoff / m_sampleRate);

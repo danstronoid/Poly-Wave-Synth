@@ -5,6 +5,8 @@
     Created: 10 Feb 2020 10:53:16pm
     Author:  Daniel Schwartz
 
+	This is the synth engine itself that inherits from the JUCE synthesizer.
+
   ==============================================================================
 */
 
@@ -20,12 +22,19 @@ class WaveSynthEngine : public Synthesiser {
 public:
 	WaveSynthEngine();
 
+	// prepareToPlay must be called before processing
 	void prepareToPlay(double currentSampleRate, int samplesPerBlock);
+
+	// this is an override but not marked as such because the complier doesn't recognize it as one
+	// I think this is because renderNextBlock is actually a template function?
+	// this implementation is used to call renderLfoBuffer before rendering the voices
 	void renderNextBlock(AudioBuffer<float>& output, const MidiBuffer& inputMidi, 
 		int startSample, int numSamples);
+
+	// renders the lfo signal to a buffer so that all voices render the same lfo signal
 	void renderLfoBuffer(const MidiBuffer& inputMidi, int startSample, int numSamples);
 
-
+	// set functions for all of the parameters to be controlled by the pluginEditor
 	void setOscType(WaveType type);
 	void setFMOscType(WaveType type);
 
@@ -39,7 +48,9 @@ public:
 	void setFilterLFO(float rate, float depth, bool trigger);
 
 private:
-	const int m_maxVoices{ 8 };
+	// this is the maximum number of voices to allocate
+	// 12 should provide an ample number of voices without causing problems
+	const int m_maxVoices{ 12 };
 
 	// this table generator belongs to the synth so that it can be passed around
 	// without making a bunch of copies

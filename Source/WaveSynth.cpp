@@ -5,6 +5,8 @@
     Created: 10 Feb 2020 10:53:16pm
     Author:  Daniel Schwartz
 
+	This is the synth engine itself that inherits from the JUCE synthesizer.
+
   ==============================================================================
 */
 
@@ -21,8 +23,10 @@ WaveSynthEngine::WaveSynthEngine() :
 	addSound(new WaveTableSound);
 }
 
+// prepareToPlay must be called before processing
 void WaveSynthEngine::prepareToPlay(double currentSampleRate, int samplesPerBlock)
 {
+	// allocates space for the lfoBuffer
 	m_lfo.setSampleRate(currentSampleRate);
 	m_lfoBuffer.setSize(1, samplesPerBlock);
 
@@ -30,7 +34,8 @@ void WaveSynthEngine::prepareToPlay(double currentSampleRate, int samplesPerBloc
 }
 
 // this is an override but not marked as such because the complier doesn't recognize it as one
-// I think this is because renderNextBlock is actually a template function
+// I think this is because renderNextBlock is actually a template function?
+// this implementation is used to call renderLfoBuffer before rendering the voices
 void WaveSynthEngine::renderNextBlock(AudioBuffer<float>& output, const MidiBuffer& inputMidi, 
 	int startSample, int numSamples)
 {
@@ -38,6 +43,7 @@ void WaveSynthEngine::renderNextBlock(AudioBuffer<float>& output, const MidiBuff
 	Synthesiser::renderNextBlock(output, inputMidi, startSample, numSamples);
 }
 
+// renders the lfo signal to a buffer so that all voices render the same lfo signal
 void WaveSynthEngine::renderLfoBuffer(const MidiBuffer& inputMidi, int startSample, int numSamples)
 {
 	m_lfo.calculateDelta();

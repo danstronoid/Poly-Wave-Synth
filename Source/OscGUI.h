@@ -5,6 +5,8 @@
     Created: 18 Feb 2020 4:32:07pm
     Author:  Daniel Schwartz
 
+    This creates the layout and functionality for the main Oscillator GUI
+    componenet.
   ==============================================================================
 */
 

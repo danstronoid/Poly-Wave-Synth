@@ -5,6 +5,9 @@
     Created: 18 Feb 2020 4:31:19pm
     Author:  Daniel Schwartz
 
+    This creates the layout and functionality for the Filter Envelope GUI
+    componenet.
+
   ==============================================================================
 */
 

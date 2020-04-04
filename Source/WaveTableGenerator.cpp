@@ -5,6 +5,25 @@
     Created: 11 Feb 2020 6:19:54pm
     Author:  Daniel Schwartz
 
+	This WaveTableGenerator generates and allocates memory for 4 different kinds
+	of wavetables.  A single instance of a WaveTableGenerator can be created and
+	passed around to avoid making unnecessary copies of the wave table.
+
+	This creates sine, square, saw, and tri tables.  It would be cool to add
+	more functionality to this class to create custom tables using the fourierTable
+	function.
+
+	This table generator uses a constant tablesize.  The table size could be decreased
+	as the octave is increased for better performance.  However, using a constant table
+	size decreases the likelyhood of indexing outside the bounds of the table.
+
+	The tables are bandlimited with one table per octave, but it might be better
+	to use more divisions at some point.
+
+	The number of harmonics per octave is calcualated by:
+
+		tableSize / 2^(octave + 1) - 1
+
   ==============================================================================
 */
 
@@ -18,6 +37,7 @@ WaveTableGenerator::WaveTableGenerator()
 	generateTriTable();
 }
 
+// this returns a vector of bandlimited tables for a given wavetype
 const std::vector<AudioSampleBuffer>& WaveTableGenerator::getTables(WaveType type) const
 {
 	switch (type)
@@ -35,6 +55,8 @@ const std::vector<AudioSampleBuffer>& WaveTableGenerator::getTables(WaveType typ
 	}
 }
 
+// this returns a single table 
+// the table it returns is table[0] which contains the full amount of harmonic detail
 const AudioSampleBuffer& WaveTableGenerator::getTable(WaveType type) const
 {
 	switch (type)
@@ -56,6 +78,8 @@ const int WaveTableGenerator::getTableSize() const
 {
 	return m_tableSize;
 }
+
+//==============================================================================
 
 // Private member functions
 

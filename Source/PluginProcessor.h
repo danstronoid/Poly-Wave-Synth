@@ -5,6 +5,13 @@
 
     It contains the basic framework code for a JUCE plugin processor.
 
+    Tiny Table
+    Author:  Daniel Schwartz
+
+    Tiny Table is a simple wave table synthesizer.  Each voice has 2 oscillators, 
+    2 ADSR envelopes, and one filter.  There is also a single LFO which controls 
+    the cutoff frequency of all of the filters.  There are a total of 12 voices.
+
   ==============================================================================
 */
 
@@ -82,6 +89,7 @@ public:
     // initialze all parameters
     void initParameters();
 
+    // returns the current output meter value when called
     float getMeterValue() { return meter; };
 
 private:
@@ -91,6 +99,7 @@ private:
 	float currentGain{ 1.0f };
 	float previousGain{ 1.0f };
 
+    // keep track of the magnitude of the output buffer to send to output meter
     float meter{ 0.0f };
 
     //==============================================================================

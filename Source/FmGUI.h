@@ -5,6 +5,9 @@
     Created: 22 Feb 2020 9:33:44am
     Author:  Daniel Schwartz
 
+    This creates the layout and functionality for the Frequency Modulation GUI
+    componenet.
+
   ==============================================================================
 */
 

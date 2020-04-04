@@ -5,6 +5,9 @@
     Created: 15 Feb 2020 3:58:31pm
     Author:  Daniel Schwartz
 
+	Classes for the WaveTableVoice and WaveTableSound, which inherit and implement the
+	functionality of the JUCE SynthesizerVoice and SynthesizerSound respectively.
+
   ==============================================================================
 */
 
